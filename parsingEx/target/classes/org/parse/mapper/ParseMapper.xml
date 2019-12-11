@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.parse.mapper.ParseMapper">
+
+<select id="selectAll" resultType="org.parse.domain.ParseVO">
+select *
+from tbl_parsing
+where pno > 0
+<!-- and comment like concat("%", #{keyword}, "%") -->
+and keyword = #{keyword}
+</select>
+
+<insert id="insertCode">
+insert into tbl_parsing (keyword, comment, code, language, path)
+values (#{keyword}, #{comment}, #{code}, #{language}, #{path})
+</insert>
+
+</mapper>
