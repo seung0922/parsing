@@ -12,13 +12,22 @@
 
 <form id="f1" method="POST">
 	<input type="text" name="keyword">
-	<input type="text" name="lang">
+	<input type="hidden" name="lang">
+	<input type="hidden" name="comment">
 	<button id="btn" type="submit">search</button>
 </form>
 
-<input type="checkbox" value="java">자바
-<input type="checkbox" value="py">파이썬
-<input type="checkbox" value="sql">SQL
+<div class="langCon">
+	<h3>언어</h3>
+	<input type="checkbox" value="java">자바
+	<input type="checkbox" value="py">파이썬
+	<input type="checkbox" value="sql">SQL
+</div>
+
+<div class="commentCon">
+	<h3>커멘트</h3>
+	<input type="checkbox" value="all">전체
+</div>
 
 <script
   src="https://code.jquery.com/jquery-3.4.1.min.js"
@@ -28,23 +37,37 @@
 <script>
 $(document).ready(function() {
 	
+	$langCon = $(".langCon");
+	$commentCon = $(".commentCon");
+	
 	$('#btn').on("click", function(e) {
 		
-		e.preventDefault();
+		//e.preventDefault();
 		
-		var ch = [];
+		var langArr = [];
+		
+		var langVal = null;
 
-		$('input[type=checkbox]:checked').each(function() {
+		$('.langCon input[type=checkbox]:checked').each(function() {
 			
-			ch.push($(this).val());
+			langArr.push($(this).val());
 			
-			$("input[name=lang]").val(ch);
+			langVal = langArr.toString().replace(","," ");
+			
+			$("input[name=lang]").val(langVal);
 			
 		});
 		
-		console.log(ch);
+		console.log(langVal);
 		
-		$("#f1").submit();
+		
+		if($(".commentCon input").is(":checked") == true) {
+			
+			$("input[name=comment]").val($(".commentCon input").val());
+			
+		} else {
+			$("input[name=comment]").val("comment");
+		}
 		
 	});
 	

@@ -7,7 +7,7 @@ public class ParseVO {
 
 	private Integer pno;
 	private String keyword;
-	private String comment;
+	private Integer comment;
 	private String code;
 	private String lang;
 	private String path;

@@ -13,14 +13,20 @@
   integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
   crossorigin="anonymous"></script>
 parse
-<form>
-	<input type="text" name="keyword" value="${keyword}">
+<form method="get">
+	<input type="text" name="keyword" value="${dto.keyword}">
+	<input type="hidden" name="lang" value="${dto.lang}">
+	<input type="hidden" name="comment" value="${dto.comment}">
 	<button type="submit">search</button>
 </form>
 
 <ul>
 	<c:forEach var="item" items="${list}">
-		<li>${item }</li>
+	<li>
+		<p>키워드 : ${item.keyword}</p>
+		<p>${item.lang}</p>
+		<p>${item.code}</p>
+	</li>
 	</c:forEach>
 </ul>
 

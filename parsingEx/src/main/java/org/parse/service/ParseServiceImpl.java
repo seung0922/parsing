@@ -22,7 +22,14 @@ public class ParseServiceImpl implements ParseService {
 	public List<ParseVO> selectAll(SearchDTO dto) {
 		
 		log.info("select...........................");
-		return mapper.selectAll(dto);
+		
+		List<ParseVO> arr = mapper.selectAll(dto);
+		
+		arr.forEach(i -> {
+			i.setCode(i.getCode().replace("\r\n", "<br>"));
+		});
+		
+		return arr;
 	}
 
 

@@ -18,8 +18,14 @@ where pno > 0
 </select>
 
 <insert id="insertCode">
-insert into tbl_parsing (keyword, comment, code, lang, path)
-values (#{keyword}, #{comment}, #{code}, #{lang}, #{path})
+<if test="comment == null">
+	insert into tbl_parsing (keyword, code, lang, path)
+	values (#{keyword}, #{code}, #{lang}, #{path})
+</if>
+<if test="comment != null">
+	insert into tbl_parsing (keyword, comment, code, lang, path)
+	values (#{keyword}, #{comment}, #{code}, #{lang}, #{path})
+</if>
 </insert>
 
 </mapper>
