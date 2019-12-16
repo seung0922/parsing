@@ -193,7 +193,7 @@ public class FileReaders2 {
 									} if(i == k + 1) {
 										
 										vo.setCode(code);
-										vo.setLanguage(lang);
+										vo.setLang(lang);
 										//result.add(vo);
 										
 //										System.out.println(code);
@@ -238,7 +238,7 @@ public class FileReaders2 {
 										if(!check) {
 											
 											vo.setCode(code);
-											vo.setLanguage(lang);
+											vo.setLang(lang);
 											result.add(vo);
 //											System.out.println(vo);
 										}
@@ -258,7 +258,7 @@ public class FileReaders2 {
 										code += i+ ":" + line + "\n";
 									} if(i == k+1) {
 										vo.setCode(code);
-										vo.setLanguage(lang);
+										vo.setLang(lang);
 										result.add(vo);
 //										System.out.println(vo);
 										
