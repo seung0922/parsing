@@ -9,13 +9,23 @@
 select *
 from tbl_parsing
 where pno > 0
-<!-- and comment like concat("%", #{keyword}, "%") -->
-and keyword = #{keyword}
+<foreach collection="keywords" item="keyword" open="and(" close=")" separator="or">
+	keyword = #{keyword}
+</foreach>
+<foreach collection="langs" item="lang" open="and(" close=")" separator="or">
+	lang = #{lang}
+</foreach>
 </select>
 
 <insert id="insertCode">
-insert into tbl_parsing (keyword, comment, code, language, path)
-values (#{keyword}, #{comment}, #{code}, #{language}, #{path})
+<if test="comment == null">
+	insert into tbl_parsing (keyword, code, lang, path)
+	values (#{keyword}, #{code}, #{lang}, #{path})
+</if>
+<if test="comment != null">
+	insert into tbl_parsing (keyword, comment, code, lang, path)
+	values (#{keyword}, #{comment}, #{code}, #{lang}, #{path})
+</if>
 </insert>
 
 </mapper>

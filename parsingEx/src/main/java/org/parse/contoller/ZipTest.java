@@ -15,65 +15,74 @@ import java.util.zip.ZipInputStream;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
+import org.parse.mapper.UserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.log4j.Log4j;
+
 @Component
+@Log4j
 public class ZipTest {
 	
-	@Scheduled(cron = "0 * * * * *")
+	@Autowired
+	private UserMapper mapper;
+	
+	@Scheduled(cron = "0 0 0 3 * *")
 	public void play() {
 		
-		System.out.println("play.......................");
-		System.out.println("play.......................");
-		System.out.println("play.......................");
-		System.out.println("play.......................");
-		System.out.println("===========================");
-		
-		String gitId = "seung0922";
+		log.info("play.......................");
+		log.info("play.......................");
+		log.info("play.......................");
+		log.info("play.......................");
+		log.info("===========================");
 		
 		String saveDir = "C:\\ezcode";
 		
-		List<String> result = getRepositories(gitId);
+		// 모든 사용자 id 목록 가져옴
+		List<String> idArr = mapper.getUserId();
 		
-		
-		for(String repo : result) {
+		for(String id : idArr) {
 			
-			System.out.println("repo.................>" + repo);
+			log.info(id);
 			
-			String fileURL = "https://github.com/" + gitId + "/" + repo + "/archive/master.zip";
+			// 사용자의 모든 레파지토리 목록 가져옴
+			List<String> result = getRepositories(id);
 			
-			System.out.println(fileURL);
-			
-			try {
-				// zip 파일 다운로드
-				downloadFile(fileURL, saveDir);
+			for(String repo : result) {
 				
-				// zip 파일 압축 풀기
-				decompress(saveDir + "\\" + repo + "-master.zip", saveDir);
+				log.info("repo.................>" + repo);
 				
-				File file = new File(saveDir + "\\" + repo + "-master.zip");
+				String fileURL = "https://github.com/" + id + "/" + repo + "/archive/master.zip";
 				
-				file.delete();
+				log.info(fileURL);
 				
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			} catch (Throwable e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				try {
+					// zip 파일 다운로드
+					downloadFile(fileURL, saveDir);
+					
+					// zip 파일 압축 풀기
+					decompress(saveDir + "\\" + repo + "-master.zip", saveDir + "\\" + id);
+					
+					File file = new File(saveDir + "\\" + repo + "-master.zip");
+					
+					file.delete();
+					
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				} catch (Throwable e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
-		
-		
-		System.out.println(result);
-		
 	}
-
 	
 	// github repository 목록 가져오기
 	public static List<String> getRepositories(String gitName) {
 
-		System.out.println("getRepositories..........................");
+		log.info("getRepositories..........................");
 		
 		List<String> repositories = new ArrayList<String>();
 		
@@ -212,10 +221,10 @@ public class ZipTest {
 				return;
 			}
 
-			System.out.println("Content-Type = " + contentType);
-			System.out.println("Content-Disposition = " + disposition);
-			System.out.println("Content-Length = " + contentLength);
-			System.out.println("fileName = " + fileName);
+			log.info("Content-Type = " + contentType);
+			log.info("Content-Disposition = " + disposition);
+			log.info("Content-Length = " + contentLength);
+			log.info("fileName = " + fileName);
 
 
 			// opens input stream from the HTTP connection
@@ -238,11 +247,14 @@ public class ZipTest {
 			outputStream.close();
 			inputStream.close();
  
-			System.out.println("File downloaded");
+			log.info("File downloaded");
+			
 		} else {
-			System.out.println("No file to download. Server replied HTTP code: " + responseCode);
+			
+			log.info("No file to download. Server replied HTTP code: " + responseCode);
+			
 		}
 		httpConn.disconnect();
 	}
-
+	
 }
