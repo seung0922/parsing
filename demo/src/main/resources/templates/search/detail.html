@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html 
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/basicLayout}">
+  
+  <div class="site-section" id="properties-section" layout:fragment="content">
+		<link rel="stylesheet" th:href="@{/css/search.css}">
+		<!-- EnlighterJS CSS !-->
+		<link rel="stylesheet" th:href="@{/css/enlighterjs.min.css}" />
+    <section class="search-section" id="about-section">
+		<!-- <div class="search-title">
+	    <div>
+			<h4>검색 상세</h4>
+	    	<p>내용을 작성해주세요.</p>
+	    </div>
+		</div> -->
+		
+    	<div class="search-container">
+         <div class="code-scripter">
+         	<!-- 코드 정보 영역 -->
+         	<div class="code-info">
+				<a href="#" th:text="${result.fname}"></a>
+				<span> | <small th:text="${result.lang}"></small></span>
+				<span> | <i class="fab fa-github"></i> <small>github</small></span>
+				<span> | <small>47 lines</small></span>
+				<span> |
+					<small>
+						<a href="#">https://github.com/for/star/for-star.java</a>
+						(깃허브코드면 저장소 주소)
+					</small>
+				</span>
+
+				<div class="sdetail-btns">
+					<button class="btn btn-sm btn-primary btn-outline-primary tbtn">
+					<!-- 비어있는 별-->
+					<!-- <i class="far fa-star"></i> -->
+					<!-- 채워져있는 별-->
+					<i class="fas fa-star"></i>
+					</button>
+				</div>
+			</div>
+			<!-- 코드 영역 -->
+			<div class="code-content">
+
+			<pre data-enlighter-language="java" th:text="${result.code}">
+    		</pre>
+
+			</div>
+			<div class="list-btn">
+			<button id="listBtn" class="btn btn-primary list-btn">목록가기</button>
+			</div>
+
+		</div>
+		<form id="sf" method="GET" action="/search/list">
+			<input type="hidden" name="pno" th:value="${param.pno}">
+			<input type="hidden" name="keyword" th:value="${param.keyword}">
+			<input type="hidden" name="lang" th:value="${param.lang}">
+			<input type="hidden" name="siteLink" th:value="${param.siteLink}">
+			<input type="hidden" name="comment" th:value="${param.comment}">
+		</form>
+
+    	</div>
+
+
+    </section>
+	
+	<!-- EnlighterJS -->
+    <script type="text/javascript" th:src="@{/js/enlighterjs.min.js}"></script>
+	
+    <!-- Init Code -->
+    <script type="text/javascript">
+        // - highlight all pre + code tags (CSS3 selectors)
+        // - use javascript as default language
+        // - use theme "enlighter" as default theme
+        // - replace tabs with 2 spaces
+        // EnlighterJS 플러그인 사용하기 위해서 필요함
+        EnlighterJS.init('pre', 'code', {
+			language : 'java',
+			theme: 'enlighter',
+			indent : 2
+        });
+		$(document).ready(function() {
+
+			
+			// enlighter div 자식 태그에 검색 키워드 존재 시 강조 표시
+        // .enlighter div div span - 단어마다 span 태그로 감싸져 있음
+        var keyword = $('#sf input[name=keyword]').val();
+		var keyArr = keyword.split(" ");
+        var len = $('.enlighter div div span').length;
+		
+		// 키워드 여러개인 경우
+        for (var j = 0; j < keyArr.length; j++) {
+			for (var i = 0; i < len; i++) {
+				// 검색결과 코드에 검색 키워드 존재하면
+	        	if ($('.enlighter div div span').eq(i).html().indexOf(keyArr[j]) != -1) {
+					//if ($('.enlighter div div span').eq(i).html() === keyArr[j]) {
+						
+						// 태그안에 여러개 단어 있을때 - 키워드에만 표시
+						var codeText = $('.enlighter div div span').eq(i).html();
+						if ($('.enlighter div div span').eq(i).html() != keyArr[j]) {
+							
+							var codeArr = $('.enlighter div div span').eq(i).html().split(keyArr[j]);
+							
+							$('.enlighter div div span')
+							.eq(i)
+							.html(
+								codeArr[0] 
+								+'<em style="color:#333; background-color:#faf093; font-weight: 900;">' 
+									+ keyArr[j] + '</em>'+ codeArr[1]);
+						} else {
+							// css 스타일 변경
+							$('.enlighter div div span').eq(i).css("color", "#333");
+							$('.enlighter div div span').eq(i).css("background-color", "#faf093");
+							$('.enlighter div div span').eq(i).css("font-weight", "900");
+						}
+					}
+				}
+			}
+			
+		});
+
+		$('#listBtn').on("click", function() {
+			$('#sf').submit();
+		});
+
+	</script>
+</div>
