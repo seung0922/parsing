@@ -159,27 +159,44 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		
 		$(document).ready(function() {
 
-			//라디오 요소처럼 동작시킬 체크박스 그룹 셀렉터
-			$('.linkCon input[type="checkbox"]').click(function(e){
+			var $langCon = $('.langCon input[type="checkbox"]');
+			var $linkCon = $('.linkCon input[type="checkbox"]');
+			var $commentCon = $('.commentCon input[type="checkbox"]');
+
+			// 체크박스 ---------------------------------------------------------------------
+			// 최소 한 개 이상 선택 되도록 ( 전체 해제되는 경우 없게! )
+			$langCon.on('click', function() {
+				if($('.langCon input:checked').length === 0) {
+					$(this).prop('checked', true);
+				}
+			});
+
+			$linkCon.on('click', function() {
 
 				//클릭 이벤트 발생한 요소가 체크 상태인 경우
 				if ($(this).prop('checked')) {
 					//체크박스 그룹의 요소 전체를 체크 해제후 클릭한 요소 체크 상태지정
-					$('.linkCon input[type="checkbox"]').prop('checked', false);
+					$linkCon.prop('checked', false);
+					$(this).prop('checked', true);
+				} else {
 					$(this).prop('checked', true);
 				}
+			});
 
-				});
+			//라디오 요소처럼 동작시킬 체크박스 그룹 셀렉터
+			$commentCon.on('click', function() {
+				
+				//클릭 이벤트 발생한 요소가 체크 상태인 경우
+				if ($(this).prop('checked')) {
+					//체크박스 그룹의 요소 전체를 체크 해제후 클릭한 요소 체크 상태지정
+					$commentCon.prop('checked', false);
+					$(this).prop('checked', true);
+				} else {
+					$(this).prop('checked', true);
+				}
+			});
 
-				//라디오 요소처럼 동작시킬 체크박스 그룹 셀렉터
-				$('.commentCon input[type="checkbox"]').click(function(){
-					//클릭 이벤트 발생한 요소가 체크 상태인 경우
-					if ($(this).prop('checked')) {
-						//체크박스 그룹의 요소 전체를 체크 해제후 클릭한 요소 체크 상태지정
-						$('.commentCon input[type="checkbox"]').prop('checked', false);
-						$(this).prop('checked', true);
-					}
-				});
+			//------------------------------------------------------------------------------
 
 			var $searchForm = $('#sf');
 			
@@ -268,7 +285,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 				$('#sf input[name=pno]').val(no);
 
 				$searchForm.submit();
-				
+
 			});
 
 
@@ -297,6 +314,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
 			});
 
+			// 4. 페이징 
 			$(".page-div ul").on("click", 'a', function(e) {
 
 				e.preventDefault();

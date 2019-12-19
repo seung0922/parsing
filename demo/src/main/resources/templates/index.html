@@ -156,7 +156,7 @@ header a {
 					<div class="search-check langCon">
 					<p>언어</p>
 					<div class="custom-control custom-checkbox">
-					    <input type="checkbox" class="custom-control-input" id="JAVA" value="java">
+					    <input type="checkbox" class="custom-control-input" id="JAVA" value="java" checked>
 					    <label class="custom-control-label" for="JAVA">JAVA</label>
 					</div>
 					<div class="custom-control custom-checkbox">
@@ -229,8 +229,6 @@ $('.search-title').on('click', function() {
 
 $(document).ready(function() {
 
-	$('.langCon input[type="checkbox"]').eq(0).prop('checked',true);
-
 	$('.js-sticky-header').removeClass('sticky-custom');
 	$('.js-sticky-header').removeClass('shrink');
 	$('.sticky-custom-m-span').removeClass('sticky-custom-m-icon');
@@ -258,8 +256,6 @@ $(window).scroll(function() {
 	}
 	
 })
-
-
 	</script>
 
 
@@ -267,64 +263,45 @@ $(window).scroll(function() {
 <script>
 
 var $langCon = $('.langCon input[type="checkbox"]');
-
-// if($('.langCon input[type="checkbox"]:checked').length === 1) {
-
-// 	$('.langCon input[type="checkbox"]:checked').on('click', function() {
-// 		// alert($(this).attr('type'));
-// 		$(this).prop('checked', true);
-// 	});
-
-// }
-
 var $linkCon = $('.linkCon input[type="checkbox"]');
-
-$linkCon.change(function(){
-
-	$linkCon.each(function() {
-
-		if($(this).is(':checked')) {
-			$(this).on('click', function() {
-				$(this).prop('checked', true);
-			});
-		}
-	});
-});
-
 var $commentCon = $('.commentCon input[type="checkbox"]');
 
-$commentCon.change(function(){
-
-	$commentCon.each(function() {
-
-		if($(this).is(':checked')) {
-			$(this).on('click', function() {
-				$(this).prop('checked', true);
-			});
-		}
-	});
+// 체크박스 ---------------------------------------------------------------------
+// 최소 한 개 이상 선택 되도록 ( 전체 해제되는 경우 없게! )
+$langCon.on('click', function() {
+	if($('.langCon input:checked').length === 0) {
+		$(this).prop('checked', true);
+	}
 });
 
-//라디오 요소처럼 동작시킬 체크박스 그룹 셀렉터
-$('.linkCon input[type="checkbox"]').click(function(){
+$linkCon.on('click', function() {
+
 	//클릭 이벤트 발생한 요소가 체크 상태인 경우
 	if ($(this).prop('checked')) {
 		//체크박스 그룹의 요소 전체를 체크 해제후 클릭한 요소 체크 상태지정
-		$('.linkCon input[type="checkbox"]').prop('checked', false);
+		$linkCon.prop('checked', false);
+		$(this).prop('checked', true);
+	} else {
 		$(this).prop('checked', true);
 	}
 });
 
 //라디오 요소처럼 동작시킬 체크박스 그룹 셀렉터
-$('.commentCon input[type="checkbox"]').click(function(){
+$commentCon.on('click', function() {
+	
 	//클릭 이벤트 발생한 요소가 체크 상태인 경우
 	if ($(this).prop('checked')) {
 		//체크박스 그룹의 요소 전체를 체크 해제후 클릭한 요소 체크 상태지정
-		$('.commentCon input[type="checkbox"]').prop('checked', false);
+		$commentCon.prop('checked', false);
+		$(this).prop('checked', true);
+	} else {
 		$(this).prop('checked', true);
 	}
 });
 
+//------------------------------------------------------------------------------
+
+// 검색 버튼 누를 때
 $('#searchBtn').on('click', function() {
 
 	var langArr = [];	

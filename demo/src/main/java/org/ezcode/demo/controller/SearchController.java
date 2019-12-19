@@ -83,7 +83,7 @@ public class SearchController {
 
 					log.info("keyword..........................." + k);
 
-					result = playParsing(saveDir, k, dto.getComment());
+					result = playParsing(saveDir, k, dto.getComment(), dto.getLangs());
 
 					log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 					log.info("" + result);
@@ -108,7 +108,6 @@ public class SearchController {
 		//----------------------------------------------------------------
 		// 2. google 검색일때
 
-
 	}
 
 	@GetMapping("/detail")
@@ -125,7 +124,7 @@ public class SearchController {
 
 	// ----------------------------------------------------------------------------
 	// 지정 폴더에서 해당 키워드 찾아 파싱하는 메서드
-	public List<ParseVO> playParsing(String path, String keyword, String comment) {
+	public List<ParseVO> playParsing(String path, String keyword, String comment, String[] searchLang) {
 
 		ParseVO vo = new ParseVO();
 
@@ -171,264 +170,267 @@ public class SearchController {
 						final int idx = fpath.lastIndexOf("\\");
 						final String fname = fpath.substring(idx + 1);
 						final String fnamePath = fpath.substring(0, idx);
+						
+						for(int l=0; l<searchLang.length; l++) {
 
-						/*
-						 * if 조건문
-						 */
-						if (lang.equals("java") || lang.equals("py") || lang.equals("sql")) { // 언어 조건
+							/*
+							* if 조건문
+							*/
+							if (searchLang[l].equals(lang)) { // 언어 조건
 
-							boolean isComment = false; // 여러줄 주석
-							boolean isCode = false; // 검색에 해당되는 코드
-							boolean isBrace = false; // 브레이스
-							boolean blank = false;
+								boolean isComment = false; // 여러줄 주석
+								boolean isCode = false; // 검색에 해당되는 코드
+								boolean isBrace = false; // 브레이스
+								boolean blank = false;
 
-							boolean tenline = false; // 열줄만 출력하는 변수
-							boolean flag = false; // 한줄에 브레이스 짝이 맞을 때
+								boolean tenline = false; // 열줄만 출력하는 변수
+								boolean flag = false; // 한줄에 브레이스 짝이 맞을 때
 
-							final Stack<String> checkBrace = new Stack<String>(); // 브레이스 개수 체크
+								final Stack<String> checkBrace = new Stack<String>(); // 브레이스 개수 체크
 
-							String code = "";
+								String code = "";
 
-							int tbrace = 0; // { } 한쌍 일때 +1 해주려는 변수
+								int tbrace = 0; // { } 한쌍 일때 +1 해주려는 변수
 
-							int k = 0;
+								int k = 0;
 
-							// 한줄씩 읽어온다
-							for (int i = 1; (line = br.readLine()) != null; i++) {
+								// 한줄씩 읽어온다
+								for (int i = 1; (line = br.readLine()) != null; i++) {
 
-								if (!line.trim().startsWith("import ")) {
+									if (!line.trim().startsWith("import ")) {
 
-									int open = 0;
-									int close = 0;
+										int open = 0;
+										int close = 0;
 
-									if (line.contains("{")) {
-										open++;
-									}
-									if (line.contains("}")) {
-										close++;
-									}
-
-									// { 이 한개 이상이고, { 와 } 쌍이 맞을 때
-									if (open > 0 && open == close) {
-
-										flag = true;
-										tbrace++;
-
-									} else {
-
-										flag = false;
-										tbrace = 0;
-
-									}
-
-									if (allKeyword && !keywordOn) { // 키워드 전체검색
-										for (int n = 0; n < keywords.length; n++) {
-											if ((line.toLowerCase().contains(keywords[n].toLowerCase()) || line.toUpperCase().contains(keywords[n].toUpperCase()))) {
-
-												vo = new ParseVO();
-
-												keywordOn = true;
-
-												code = "";
-
-												maxLine = 0;
-
-												vo.setComment(0);
-												vo.setKeyword(keywords[n]);
-												vo.setPath(fnamePath);
-												vo.setFname(fname);
-
-												isCode = true; // 코드 시작을 알려줌
-												vo.setStart(i);
-
-												k = i + 11; // 혹시나 열줄만 출력할거면 아래 10줄만 출력하기 위한 변수
-											}
+										if (line.contains("{")) {
+											open++;
 										}
-									} // if(allKeyword)
-
-									if (!allKeyword) {
-
-										// 1. 여러줄 주석
-										if (line.trim().startsWith("/*")) {
-											isComment = true;
+										if (line.contains("}")) {
+											close++;
 										}
 
-										// 주석일때
-										if (isComment) {
+										// { 이 한개 이상이고, { 와 } 쌍이 맞을 때
+										if (open > 0 && open == close) {
+
+											flag = true;
+											tbrace++;
+
+										} else {
+
+											flag = false;
+											tbrace = 0;
+
+										}
+
+										if (allKeyword && !keywordOn) { // 키워드 전체검색
 											for (int n = 0; n < keywords.length; n++) {
 												if ((line.toLowerCase().contains(keywords[n].toLowerCase()) || line.toUpperCase().contains(keywords[n].toUpperCase()))) {
+
 													vo = new ParseVO();
+
+													keywordOn = true;
 
 													code = "";
 
 													maxLine = 0;
 
-													vo.setComment(1);
+													vo.setComment(0);
 													vo.setKeyword(keywords[n]);
 													vo.setPath(fnamePath);
 													vo.setFname(fname);
-													vo.setStart(i);
-
-													isCode = true;
-
-												}
-											}
-
-											// 주석 끝 (여러줄 주석)
-											if (line.trim().endsWith("*/")) {
-												isComment = false;
-												continue;
-											}
-
-										} // if(iscomment)
-
-									} // if(!allKeyword)
-
-									// -----------------------------------------------------------------------------------------------------------
-
-									// 2. 한줄 주석
-									if (line.contains("//") && !allKeyword) { // 라인에 //가 포함되어있다.
-
-										// 주석인데 해당 키워드 존재할때
-										if (line.trim().startsWith("//")) {
-
-											for (int n = 0; n < keywords.length; n++) {
-												if ((line.toLowerCase().contains(keywords[n].toLowerCase()) || line.toUpperCase().contains(keywords[n].toUpperCase()))) {
-													vo = new ParseVO();
-
-													code = "";
-
-													maxLine = 0;
-
-													vo.setComment(1);
-													vo.setKeyword(keywords[n]);
-													vo.setPath(fnamePath);
-													vo.setFname(fname);
-													vo.setStart(i);
 
 													isCode = true; // 코드 시작을 알려줌
+													vo.setStart(i);
 
-													k = i + 10; // 아래 10줄만 출력하기 위한 변수
+													k = i + 11; // 혹시나 열줄만 출력할거면 아래 10줄만 출력하기 위한 변수
+												}
+											}
+										} // if(allKeyword)
 
+										if (!allKeyword) {
+
+											// 1. 여러줄 주석
+											if (line.trim().startsWith("/*")) {
+												isComment = true;
+											}
+
+											// 주석일때
+											if (isComment) {
+												for (int n = 0; n < keywords.length; n++) {
+													if ((line.toLowerCase().contains(keywords[n].toLowerCase()) || line.toUpperCase().contains(keywords[n].toUpperCase()))) {
+														vo = new ParseVO();
+
+														code = "";
+
+														maxLine = 0;
+
+														vo.setComment(1);
+														vo.setKeyword(keywords[n]);
+														vo.setPath(fnamePath);
+														vo.setFname(fname);
+														vo.setStart(i);
+
+														isCode = true;
+
+													}
 												}
 
-											} // end of for
-										}
+												// 주석 끝 (여러줄 주석)
+												if (line.trim().endsWith("*/")) {
+													isComment = false;
+													continue;
+												}
 
-									} // 한줄 주석 끝
-									// -----------------------------------------------------------------------------------------------------------
-									// 브레이스 유무
-									// if (maxLine >= 30){
+											} // if(iscomment)
 
-									// vo.setCode(code);
-									// vo.setLang(lang);
-									// result.add(vo);
-									// maxLine = 0;
-									// continue;
-									// }
+										} // if(!allKeyword)
 
-									maxLine++;
+										// -----------------------------------------------------------------------------------------------------------
 
-										if (isCode) {
-											isBrace = (line.contains("{") || line.contains("{")) ? true : isBrace;
-										}
+										// 2. 한줄 주석
+										if (line.contains("//") && !allKeyword) { // 라인에 //가 포함되어있다.
 
-										if (isCode && tenline) { // 열 줄만 나오게 하는 코드이다.
-											if (i <= k) {
+											// 주석인데 해당 키워드 존재할때
+											if (line.trim().startsWith("//")) {
+
+												for (int n = 0; n < keywords.length; n++) {
+													if ((line.toLowerCase().contains(keywords[n].toLowerCase()) || line.toUpperCase().contains(keywords[n].toUpperCase()))) {
+														vo = new ParseVO();
+
+														code = "";
+
+														maxLine = 0;
+
+														vo.setComment(1);
+														vo.setKeyword(keywords[n]);
+														vo.setPath(fnamePath);
+														vo.setFname(fname);
+														vo.setStart(i);
+
+														isCode = true; // 코드 시작을 알려줌
+
+														k = i + 10; // 아래 10줄만 출력하기 위한 변수
+
+													}
+
+												} // end of for
+											}
+
+										} // 한줄 주석 끝
+										// -----------------------------------------------------------------------------------------------------------
+										// 브레이스 유무
+										// if (maxLine >= 30){
+
+										// vo.setCode(code);
+										// vo.setLang(lang);
+										// result.add(vo);
+										// maxLine = 0;
+										// continue;
+										// }
+
+										maxLine++;
+
+											if (isCode) {
+												isBrace = (line.contains("{") || line.contains("{")) ? true : isBrace;
+											}
+
+											if (isCode && tenline) { // 열 줄만 나오게 하는 코드이다.
+												if (i <= k) {
+													code += line + "\r\n";
+													isBrace = false;
+												}
+												if (i == k + 1 || maxLine >= 30) {
+
+													vo.setCode(code);
+													vo.setLang(lang);
+													result.add(vo);
+
+													// System.out.println(code);
+													flag = false;
+													isBrace = false;
+													isCode = false;
+													tenline = false;
+													keywordOn = false;
+
+													code = "";
+
+												}
+											}
+
+											// 브레이스 있을 때
+											else if (isCode && isBrace) {
 												code += line + "\r\n";
-												isBrace = false;
-											}
-											if (i == k + 1 || maxLine >= 30) {
 
-												vo.setCode(code);
-												vo.setLang(lang);
-												result.add(vo);
-
-												// System.out.println(code);
-												flag = false;
-												isBrace = false;
-												isCode = false;
-												tenline = false;
-												keywordOn = false;
-
-												code = "";
-
-											}
-										}
-
-										// 브레이스 있을 때
-										else if (isCode && isBrace) {
-											code += line + "\r\n";
-
-											// 코드는 시작했다.
-											// 브레이스가 열려있다.
-											// flag = 한줄에 { } 둘 다 있을때 true.
-											if (flag && tbrace >= 2) { // 두 줄 연속으로 {} 있으면?
-												tenline = true; // 열줄만 출력하게 tenline이 트루가 됩니다.
-												tbrace = 0; // 어차피 열 줄만 출력하도록 마음먹었으니 tbrace는 0으로.
-											}
-
-											else if (isCode && !flag) {
-												// 브레이스 개수 체크
-
-												// 라인에 {가 있으면 스택에 하나 추가
-												if (line.contains("{")) {
-													checkBrace.push("{");
-													blank = false;
+												// 코드는 시작했다.
+												// 브레이스가 열려있다.
+												// flag = 한줄에 { } 둘 다 있을때 true.
+												if (flag && tbrace >= 2) { // 두 줄 연속으로 {} 있으면?
+													tenline = true; // 열줄만 출력하게 tenline이 트루가 됩니다.
+													tbrace = 0; // 어차피 열 줄만 출력하도록 마음먹었으니 tbrace는 0으로.
 												}
 
-												// 라인에 }가 있으면 스택 하나 팝팝
-												if (line.contains("}")) {
-													checkBrace.pop();
-													if (checkBrace.empty())
-														blank = true;
-												}
+												else if (isCode && !flag) {
+													// 브레이스 개수 체크
 
-												// 브레이스 체크 스택 비었으면 코드 출력안함
-												if ((checkBrace.empty() && blank) || maxLine >= 30) {
+													// 라인에 {가 있으면 스택에 하나 추가
+													if (line.contains("{")) {
+														checkBrace.push("{");
+														blank = false;
+													}
+
+													// 라인에 }가 있으면 스택 하나 팝팝
+													if (line.contains("}")) {
+														checkBrace.pop();
+														if (checkBrace.empty())
+															blank = true;
+													}
+
+													// 브레이스 체크 스택 비었으면 코드 출력안함
+													if ((checkBrace.empty() && blank) || maxLine >= 30) {
+
+														vo.setCode(code);
+														vo.setLang(lang);
+														result.add(vo);
+
+														code = "";
+														isBrace = false;
+														isCode = false;
+														keywordOn = false;
+														continue;
+													}
+
+												} // end if(!flag)
+
+											} // end if(isCode && isBrace)
+
+											else if (isCode && !isBrace) {
+												code += line + "\r\n";
+
+												if (i == k + 1 || maxLine >= 30) {
 
 													vo.setCode(code);
 													vo.setLang(lang);
 													result.add(vo);
 
 													code = "";
-													isBrace = false;
+
+													tenline = false;
 													isCode = false;
 													keywordOn = false;
-													continue;
 												}
-
-											} // end if(!flag)
-
-										} // end if(isCode && isBrace)
-
-										else if (isCode && !isBrace) {
-											code += line + "\r\n";
-
-											if (i == k + 1 || maxLine >= 30) {
-
-												vo.setCode(code);
-												vo.setLang(lang);
-												result.add(vo);
-
-												code = "";
-
-												tenline = false;
-												isCode = false;
-												keywordOn = false;
 											}
-										}
 
-									// -----------------------------------------------------------------------------------------------------------
-								}
-							} // line출력 for문 끝
-							isComment = false; // 여러줄 주석
-							isCode = false; // 검색에 해당되는 코드
-							isBrace = false; // 브레이스
+										// -----------------------------------------------------------------------------------------------------------
+									}
+								} // line출력 for문 끝
+								isComment = false; // 여러줄 주석
+								isCode = false; // 검색에 해당되는 코드
+								isBrace = false; // 브레이스
 
-							tenline = false; // 열줄만 출력하는 변수
-							flag = false; // 한줄에 브레이스 짝이 맞을 때.
-							keywordOn = false;
+								tenline = false; // 열줄만 출력하는 변수
+								flag = false; // 한줄에 브레이스 짝이 맞을 때.
+								keywordOn = false;
+							}
 						}
 
 						br.close();
@@ -439,7 +441,7 @@ public class SearchController {
 
 				} else if (f.isDirectory()) {
 					// 하위 디렉토리 존재 시 다시 탐색
-					playParsing(f.getCanonicalPath().toString(), keyword, comment);
+					playParsing(f.getCanonicalPath().toString(), keyword, comment, searchLang);
 				}
 
 			}
