@@ -9,13 +9,6 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		<link rel="stylesheet" th:href="@{/css/enlighterjs.min.css}" />
     <section class="search-section" id="about-section">
 		
-		<!-- <div class="search-title">
-	    <div>
-			<h4>검색 결과</h4>
-	    	<p>내용을 작성해주세요.</p>
-	    </div>
-    	</div> -->
-
     	<div class="search-content">
     	<!-- 검색 조건 div -->
     	<div class="search-condition">
@@ -88,16 +81,22 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		</div>
         <small>'[[${pm.paging.keyword}]]' 검색결과가 [[${pm.total}]]건 있습니다.</small>
 		</div>
+
+		<!-- [[${list}]]dcdcdcdcd
+		[[${pm}]] -->
 		
         <!-- 코드 검색결과 div -->
         <div th:if="${list[0].keyword} != null" th:each="item : ${list}" class="code-scripter">
 			<a th:href="${item.pno}" th:text="${item.fname}"></a>
 			<span>  | <small th:text="${item.lang}"></small></span>
-			<span>  |  <i class="fab fa-github"></i> <small>github</small></span>
+			<span th:if="${param.siteLink.toString().equals('github')}" >  |  <i class="fab fa-github"></i> <small>[[${param.siteLink}]]</small>
+			</span>
+			<span th:if="${param.siteLink.toString().equals('google')}" >  |  <i class="fab fa-google"></i> <small>[[${param.siteLink}]]</small>
+			</span>
 			<!-- 코드 영역 -->
 			<div class="code-content">
-
-			<pre data-enlighter-language="java" th:text="${item.code}">
+			
+			<pre th:data-enlighter-language="${item.lang}" th:text="${item.code}" th:data-enlighter-lineoffset="${item.start}">
 			</pre>
 			
 			</div>

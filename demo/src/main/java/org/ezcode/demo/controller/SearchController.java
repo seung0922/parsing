@@ -1,18 +1,28 @@
 package org.ezcode.demo.controller;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.stream.Stream;
 
+import javax.lang.model.util.Elements;
+
 import org.ezcode.demo.domain.PageMaker;
 import org.ezcode.demo.domain.ParseVO;
 import org.ezcode.demo.domain.SearchDTO;
 import org.ezcode.demo.service.ParseService;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.Jsoup;
+import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,6 +56,11 @@ public class SearchController {
 	@GetMapping("/list")
 	public void searchList(@ModelAttribute("dto") SearchDTO dto, Model model) {
 		
+		List<ParseVO> list = new ArrayList<>();
+
+		
+		String[] keywordArr = dto.getKeywords();
+
 		// 1. github 검색일 때
 
 		if(dto.getKeyword().equals("")) {
@@ -63,46 +78,74 @@ public class SearchController {
 			log.info("kk??????????????????....." + kk);
 
 			// 키워드를 하나씩 찾아서 없으면 db에 넣는다
-			String[] keywordArr = dto.getKeywords();
 
-			Stream.of(keywordArr).forEach(k -> {
+			if(dto.getSiteLink().equals("github")){
 
-				// 키워드 한개로 지정해놓는다.
-				dto.setKeyword(k);
+				Stream.of(keywordArr).forEach(k -> {
 
-				// 파싱한 결과 저장하는 리스트
-				result = new ArrayList<ParseVO>();
+					// 키워드 한개로 지정해놓는다.
+					dto.setKeyword(k);
 
-				// 키워드 하나 지정한 걸로 검색했는데 null 뜨면
-				if (parseService.find(dto).isEmpty()) {
+					// 파싱한 결과 저장하는 리스트
+					result = new ArrayList<ParseVO>();
 
-					log.info("널임");
+					// 키워드 하나 지정한 걸로 검색했는데 null 뜨면
+					if (parseService.find(dto).isEmpty()) {
 
-					// 1파일 저장된 경로에서 해당키워드로 파싱한 다음 DB에 저장시킴
-					final String saveDir = "C:\\ezcode";
+						log.info("널임");
 
-					log.info("keyword..........................." + k);
+						// 1파일 저장된 경로에서 해당키워드로 파싱한 다음 DB에 저장시킴
+						final String saveDir = "C:\\ezcode";
 
-					result = playParsing(saveDir, k, dto.getComment(), dto.getLangs());
+						log.info("keyword..........................." + k);
 
-					log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-					log.info("" + result);
-					log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+						result = playParsing(saveDir, k, dto.getComment(), dto.getLangs());
 
-					result.forEach(r -> {
-						log.info("" + r);
-						parseService.insertCode(r);
-					});
+						log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+						log.info("" + result);
+						log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
-				} 
+						result.forEach(r -> {
+							log.info("" + r);
+							parseService.insertCode(r);
+						});
 
-			});
+					} 
 
-			// 총 결과 개수
-			dto.setKeyword(kk);
+				});
+
+				// 총 결과 개수
+				dto.setKeyword(kk);
+				
+				model.addAttribute("list", parseService.findAll(dto));
+				model.addAttribute("pm", new PageMaker(parseService.getCount(dto), dto));
+			}
+
+
+			if(dto.getSiteLink().equals("google")){
+				Stream.of(keywordArr).forEach(k -> {
+	
+					// 키워드 한개로 지정해놓는다.
+					// dto.setKeyword(k);
+	
+					// 파싱한 결과 저장하는 리스트
+					result = new ArrayList<ParseVO>();
+	
+					result = (crawling(dto.getKeyword(), dto.getLang()));
+
+					list.addAll(result);
+
+				});
 			
-			model.addAttribute("list", parseService.findAll(dto));
-			model.addAttribute("pm", new PageMaker(parseService.getCount(dto), dto));
+				log.info("list.....................???");
+				// log.info("" + list);
+		
+				model.addAttribute("list", list);
+				model.addAttribute("pm", new PageMaker(list.size(), dto));
+			}
+	
+	
+	
 		}
 
 		//----------------------------------------------------------------
@@ -454,4 +497,320 @@ public class SearchController {
 
 	} // subDirList2()
 
+	public List<ParseVO> crawling(String keyword, String lang) {
+		ParseVO vo = new ParseVO();
+
+		int cnt = 0;
+		String[] ran = {"반복", "포", "조건", "이프"};
+		// String grammers = keyword; // 여기 넣어주면 됨
+		
+		// vo.setComment(0);
+		// vo.setKeyword(keyword);
+		// vo.setFname("tistory");
+		// vo.setLang(lang);
+
+
+		int page = 1;
+
+		String langs = lang; // 여기도
+
+		for(int i = 0; i < ran.length; i++) {
+			if(keyword.contains(ran[i])) {
+				cut(ran[i]);
+			}
+		}
+		
+		if(!keyword.replaceAll("[ㄱ-힣]", "").equals("")) {
+			keyword = keyword.replaceAll("[ㄱ-힣]", "");
+			
+		}
+		
+
+		
+		String[] grammer = {}; // 파싱 메소드에 보내줄 배열값.
+
+		grammer = keyword.split(" ");
+
+
+		String grammerurl = keyword.replaceAll(" ", "+"); // url에 보내질 문자열
+		
+		
+		String langurl = langs.replaceAll(" ", "+");
+
+		Document doc = null;
+		Document doc2 = null;
+
+		String str = "div.info>span.f_l>a:nth-child(1)"; // 페이지 돌면서 사이트들 링크 따오는거
+
+		long start = System.currentTimeMillis();
+		long middle = 0L;			// 중간점검 하는 변수
+		
+		do {
+			String urlurl1 = "https://search.daum.net/search?w=blog&f=section&SA=tistory&lpp=10&nil_profile=vsearch&nil_src=tistory&q=" + langurl + "+" + grammerurl + "&page=" + page;
+
+			log.info("유알엘 확인!!!!!!!!!!!!   " + urlurl1);
+
+			try {
+				doc = Jsoup.connect(urlurl1).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36").get();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			org.jsoup.select.Elements element = doc.select(str);
+			for (Element el : element) {
+
+//					System.out.println(el.attr("abs:href"));
+				String url2 = el.attr("abs:href");
+				// log.info("ㅇㄹㅇㄹㅇㄹㅇㄹ " + url2);
+				// vo.setPath(url2);
+
+				String[] str2 = { "pre", ".colorscripter-code td:nth-child(2) div:nth-child(1)" };
+				try {
+					doc2 = Jsoup.connect(url2).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36").get();
+					// log.info("dfdfdfdfdfdf   " + doc2);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				for (int i = 0; i < str2.length; i++) {
+					org.jsoup.select.Elements element2 = doc2.select(str2[i]);
+					if (!str2[i].equals("pre")) {
+						for (Element el2 : element2) { // 하위 뉴스 기사들을 for문 돌면서 출력
+							for (Element al2 : el2.select("div div")) {
+								// log.info("ddddd" + al2.text());
+								vo = new ParseVO();
+				
+								crawlingParse(al2.text(), grammer, vo, lang, url2);
+								middle = System.currentTimeMillis();
+								if(middle - start >= 1000) {
+									break;
+								}
+							}
+						}
+					} else {
+						for (Element el2 : element2) { // 하위 뉴스 기사들을 for문 돌면서 출력
+							
+							// log.info("ddddd" + el2.text());
+							vo = new ParseVO();
+			
+							
+							crawlingParse(el2.text(), grammer, vo, lang, url2);
+							middle = System.currentTimeMillis();
+							if(middle - start >= 1000) {
+								break;
+							}
+						}
+					}
+				}
+
+			}
+			page += 1;
+		} while (page == 5);
+
+		long end = System.currentTimeMillis() - start;
+		
+		log.info("걸린 시간 : " + end);
+
+		// result.add(vo);
+
+		return result;
+	}
+
+	public void crawlingParse(String all, String[] grammer, ParseVO vo, String lang, String url2) {
+		String str = "";
+		boolean allKeyword = true; // 모든 키워드 찾는 변수
+		boolean keywordOn = false;
+		
+		InputStream is = new ByteArrayInputStream(all.getBytes());
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		
+
+		// log.info("" + all);
+
+		try {
+
+			String line = "";
+
+			boolean isCode = false; // 검색에 해당되는 코드
+			boolean isBrace = false; // 브레이스
+			boolean blank = false;
+			
+			boolean tenline = false; // 열줄만 출력하는 변수
+			boolean flag = false; // 한줄에 브레이스 짝이 맞을 때.
+
+			Stack<String> checkBrace = new Stack<String>(); // 브레이스 개수 체크
+
+			String code = "";
+
+			int tbrace = 0;
+			int k = 0;
+
+			// 한줄씩 읽어온다
+			for (int i = 1; (line = br.readLine()) != null; i++) {
+				vo = new ParseVO();
+				vo.setComment(0);
+				vo.setFname("tistory");
+				vo.setLang(lang);
+				vo.setPath(url2);
+				// log.info("" + line);
+				if (!line.trim().startsWith("import ") && !line.trim().startsWith("public") && !line.trim().startsWith("package")) {
+
+					int open = 0; // 한 줄에 { 갯수
+					int close = 0; // 한 줄에 } 갯수
+
+					if (line.contains("{")) {
+						open++;
+					}
+					if (line.contains("}")) {
+						close++;
+					}
+
+					if (open > 0 && open == close) { // 한줄에 브레이스 열고닫는게 둘다 있다?
+						flag = true; // 플래그 on
+						tbrace++; // 티 브레이스 +1
+					} else {
+						flag = false; // 누적되지 않는다면 플래그와 tbrace 원래대로.
+						tbrace = 0;
+					}
+
+					// if (allKeyword) { // 키워드 전체검색
+						for (int n = 0; n < grammer.length; n++) {
+							if ((line.toLowerCase().contains(grammer[n].trim().toLowerCase()) || line.toUpperCase().contains(grammer[n].trim().toUpperCase())) && keywordOn == false) {
+								keywordOn = true;
+								str = grammer[n];
+
+
+								code = "";
+
+								isCode = true; // 코드 시작을 알려줌
+
+								k = i + 11; // 혹시나 열줄만 출력할거면 아래 10줄만 출력하기 위한 변수
+							}
+						}
+					// }
+
+
+					// 브레이스 유무
+					if (isCode) {
+						isBrace = ((line.indexOf("{")) != -1 || (line.contains("}"))) ? true : isBrace;
+					}
+
+
+					if (isCode && tenline) { // 열 줄만 나오게 하는 코드이다.
+						if (i <= k) {
+							code += line + "\n";
+							isBrace = false;
+						}
+						if (i == k + 1) {
+							vo.setStart(i);			
+							vo.setCode(code);
+							vo.setKeyword(str);
+							result.add(vo);
+							// log.info("씨엔티 " + cnt++);
+							code = "";
+							flag = false;
+							isBrace = false;
+							tenline = false;
+							isCode = false;
+							keywordOn = false;
+
+						}
+					}
+
+					else if (isCode && isBrace) {
+
+						code += line + "\n";
+//									System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+//									System.out.println(code);
+
+						// 코드는 시작했다.
+						// 브레이스가 열려있다.
+						// flag = 한줄에 { } 둘 다 있을때 true.
+						if (flag && tbrace >= 2) { // 두 줄 연속으로 {} 있으면?
+							tenline = true; // 열줄만 출력하게 tenline이 트루가 됩니다.
+							tbrace = 0; // 어차피 열 줄만 출력하도록 마음먹었으니 tbrace는 0으로.
+						}
+
+						else if (isCode && !flag) { // 그 라인에 { } 둘다 있지 않으면.
+
+							if (line.indexOf("{") != -1) {
+								checkBrace.push("{"); // 라인에 {가 있으면 스택에 하나 추가
+								blank = false;
+								
+							}
+							if (line.indexOf("}") != -1) {
+								checkBrace.pop(); // 라인에 }가 있으면 스택 하나 팝팝
+								if(checkBrace.empty()) {
+									blank = true;
+								}
+							}
+
+							if (checkBrace.empty() && blank) {
+								vo.setStart(i);			
+								vo.setCode(code);
+								vo.setKeyword(str);
+								result.add(vo);
+								// log.info("씨엔티 " + cnt++);
+								code = "";
+								isBrace = false;
+								isCode = false;
+								keywordOn = false;
+								continue;
+							}
+						} // end if(!flag)
+
+//									isBrace = false;
+
+					} // end if(isCode && isBrace)
+
+					else if (isCode && !isBrace) {
+						code += line + "\n";
+
+						if (i == k + 1) {
+							vo.setStart(i);			
+							vo.setCode(code);
+							vo.setKeyword(str);
+							result.add(vo);
+							// log.info("씨엔티 " + cnt++);
+							code = "";
+							tenline = false;
+							isCode = false;
+							keywordOn = false;
+						}
+					}
+					continue;
+				} // 임포트 방지
+			} // line출력 for문 끝
+			isCode = false; // 검색에 해당되는 코드
+			isBrace = false; // 브레이스
+
+			tenline = false; // 열줄만 출력하는 변수
+			flag = false; // 한줄에 브레이스 짝이 맞을 때.
+			keywordOn = false;
+
+			br.close();
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+	} // subDirList()
+
+	public static String cut(String kw) {
+		
+		
+
+		if(kw.equals("반복") || kw.equals("포")) {
+			return kw = kw.replace(kw, "for");
+		}
+		
+		if(kw.equals("조건") || kw.equals("이프")) {
+			return kw = kw.replace(kw, "if");
+		}
+	
+		return kw;	
+	}
 }

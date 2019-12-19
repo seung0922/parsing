@@ -21,7 +21,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
          	<div class="code-info">
 				<a id="fname" href="#" th:text="${result.fname}"></a>
 				<span> | <small th:text="${result.lang}"></small></span>
-				<span> | <i class="fab fa-github"></i> <small>github</small></span>
+				<span> | <i class="fab fa-github"></i> <small>[[${param.siteLink}]]</small></span>
 				<span> | <small id="lineCnt"></small></span>
 				<span> |
 					<small>
@@ -33,16 +33,16 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 				<div class="sdetail-btns">
 					<button class="btn btn-sm btn-primary btn-outline-primary tbtn">
 					<!-- 비어있는 별-->
-					<!-- <i class="far fa-star"></i> -->
+					<i class="far fa-star"></i>
 					<!-- 채워져있는 별-->
-					<i class="fas fa-star"></i>
+					<!-- <i class="fas fa-star"></i> -->
 					</button>
 				</div>
 			</div>
 			<!-- 코드 영역 -->
 			<div class="code-content">
 
-			<pre data-enlighter-language="java" th:text="${result.code}">
+			<pre th:data-enlighter-language="${result.lang}" th:text="${result.code}" th:data-enlighter-lineoffset="${result.start}">
     		</pre>
 
 			</div>
@@ -51,7 +51,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			</div>
 
 		</div>
-		
+
 		<form id="sf" method="GET" action="/search/list">
 			<input type="hidden" name="page" th:value="${param.page}">
 			<input type="hidden" name="amount" th:value="${param.amount}">
@@ -83,7 +83,18 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			indent : 2
         });
 
+		// 별 누를 때 이벤트
 		$(document).ready(function() {
+
+			var $starBtn = $('.sdetail-btns i');
+
+			$('.sdetail-btns').on('click', function() {
+				if($starBtn.attr('class') === 'far fa-star') {
+					$starBtn.attr('class', 'fas fa-star');
+				} else {
+					$starBtn.attr('class', 'far fa-star');
+				}
+			});
 			
 			// enlighter div 자식 태그에 검색 키워드 존재 시 강조 표시
 			// .enlighter div div span - 단어마다 span 태그로 감싸져 있음
