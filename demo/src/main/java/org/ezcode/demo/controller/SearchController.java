@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Stack;
 import java.util.stream.Stream;
 
+import org.ezcode.demo.domain.PageMaker;
 import org.ezcode.demo.domain.ParseVO;
 import org.ezcode.demo.domain.SearchDTO;
-import org.ezcode.demo.mapper.ParseMapper;
 import org.ezcode.demo.service.ParseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -45,76 +45,74 @@ public class SearchController {
 
 	@GetMapping("/list")
 	public void searchList(@ModelAttribute("dto") SearchDTO dto, Model model) {
+		
+		// 1. github 검색일 때
 
-		// db에서 찾은 결과 저장하는 리스트
-		List<ParseVO> list = new ArrayList<>();
+		if(dto.getKeyword().equals("")) {
 
-		log.info("parse get..........................");
-		log.info("searchDTO: " + dto);
+			model.addAttribute("count", 0);
+			model.addAttribute("list", new ParseVO());
 
-		// 키워드를 하나씩 찾아서 없으면 db에 넣고 있으면 list에 집어넣는다.
-		String[] keywordArr = dto.getKeywords();
+		} else {
 
-		Stream.of(keywordArr).forEach(k -> {
+			log.info("parse get..........................");
+			log.info("searchDTO: " + dto);
+			
+			String kk = dto.getKeyword();
 
-			// 키워드 한개로 지정해놓는다.
-			dto.setKeyword(k);
+			log.info("kk??????????????????....." + kk);
 
-			// 키워드 한개 지정한 걸로 db에서 찾는다
-			List<ParseVO> tmp = parseService.find(dto);
+			// 키워드를 하나씩 찾아서 없으면 db에 넣는다
+			String[] keywordArr = dto.getKeywords();
 
-			// 파싱한 결과 저장하는 리스트
-			result = new ArrayList<ParseVO>();
+			Stream.of(keywordArr).forEach(k -> {
 
-			// 1. 검색했는데 null 뜨면
-			if (tmp.isEmpty()) {
+				// 키워드 한개로 지정해놓는다.
+				dto.setKeyword(k);
 
-				log.info("널임");
+				// 파싱한 결과 저장하는 리스트
+				result = new ArrayList<ParseVO>();
 
-				// 1-1. 파일 저장된 경로에서 해당키워드로 파싱한 다음 DB에 저장시킴
-				String saveDir = "C:\\ezcode";
+				// 키워드 하나 지정한 걸로 검색했는데 null 뜨면
+				if (parseService.find(dto).isEmpty()) {
 
-				log.info("keyword..........................." + dto.getKeyword());
+					log.info("널임");
 
-				result.addAll(subDirList2(saveDir, dto.getKeyword(), dto.getComment()));
+					// 1파일 저장된 경로에서 해당키워드로 파싱한 다음 DB에 저장시킴
+					final String saveDir = "C:\\ezcode";
 
-				log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-				log.info("" + result);
-				log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+					log.info("keyword..........................." + k);
 
-				result.forEach(r -> {
-					log.info("" + r);
-					parseService.insertCode(r);
-				});
+					result = playParsing(saveDir, k, dto.getComment());
 
-				////////////// 여기까진 됨
+					log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+					log.info("" + result);
+					log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
-				// 1-2. 해당 키워드로 다시 DB에서 찾은 뒤 보내줌
-				List<ParseVO> tmp2 = parseService.find(dto);
+					result.forEach(r -> {
+						log.info("" + r);
+						parseService.insertCode(r);
+					});
 
-				log.info("" + tmp2);
+				} 
 
-				list.addAll(tmp2);
+			});
 
-			} else {
-				// 2. 검색했는데 결과 나옴
-				// 2-1. list 에 넣음
-				log.info("널아냐");
-				log.info("" + tmp);
+			// 총 결과 개수
+			dto.setKeyword(kk);
+			
+			model.addAttribute("list", parseService.findAll(dto));
+			model.addAttribute("pm", new PageMaker(parseService.getCount(dto), dto));
+		}
 
-				list.addAll(tmp);
-			}
-		});
+		//----------------------------------------------------------------
+		// 2. google 검색일때
 
-		log.info("list.....................???");
-		log.info("" + list);
-
-		model.addAttribute("list", list);
 
 	}
 
 	@GetMapping("/detail")
-	public void searchDetail(SearchDTO dto, Model model) {
+	public void searchDetail(@ModelAttribute("dto") SearchDTO dto,  Model model) {
 
 		log.info("get index...............................");
 
@@ -127,7 +125,7 @@ public class SearchController {
 
 	// ----------------------------------------------------------------------------
 	// 지정 폴더에서 해당 키워드 찾아 파싱하는 메서드
-	public List<ParseVO> subDirList2(String path, String keyword, String comment) {
+	public List<ParseVO> playParsing(String path, String keyword, String comment) {
 
 		ParseVO vo = new ParseVO();
 
@@ -141,38 +139,38 @@ public class SearchController {
 			allKeyword = true;
 		}
 
-		String[] keywords = keyword.split(",");
+		final String[] keywords = keyword.split(",");
 
 		// Stream.of(keyword).forEach(y -> {
 		// System.out.println("개발 끝났져?? " + y);
 		// });
 
-		File file = new File(path);
+		final File file = new File(path);
 
-		File[] fileList = file.listFiles();
+		final File[] fileList = file.listFiles();
 
 		try {
-			for (File f : fileList) {
+			for (final File f : fileList) {
 				if (f.isFile()) { // 파일일때
 					/*
 					 * 예외처리
 					 */
 					try {
-						FileReader fr = new FileReader(f.getCanonicalPath());
-						BufferedReader br = new BufferedReader(fr);
+						final FileReader fr = new FileReader(f.getCanonicalPath());
+						final BufferedReader br = new BufferedReader(fr);
 
 						String line = "";
 
-						String fpath = f.getPath();
+						final String fpath = f.getPath();
 
 						// 확장자 얻어오기
-						int langIdx = f.getName().lastIndexOf('.');
-						String lang = f.getName().substring(langIdx + 1);
+						final int langIdx = f.getName().lastIndexOf('.');
+						final String lang = f.getName().substring(langIdx + 1);
 
 						// 파일 저장된 경로와 파일명 얻어오기
-						int idx = fpath.lastIndexOf("\\");
-						String fname = fpath.substring(idx + 1);
-						String fnamePath = fpath.substring(0, idx);
+						final int idx = fpath.lastIndexOf("\\");
+						final String fname = fpath.substring(idx + 1);
+						final String fnamePath = fpath.substring(0, idx);
 
 						/*
 						 * if 조건문
@@ -183,13 +181,11 @@ public class SearchController {
 							boolean isCode = false; // 검색에 해당되는 코드
 							boolean isBrace = false; // 브레이스
 							boolean blank = false;
-							String keywordex = "";
 
 							boolean tenline = false; // 열줄만 출력하는 변수
 							boolean flag = false; // 한줄에 브레이스 짝이 맞을 때
-							int count = 0;
 
-							Stack<String> checkBrace = new Stack<String>(); // 브레이스 개수 체크
+							final Stack<String> checkBrace = new Stack<String>(); // 브레이스 개수 체크
 
 							String code = "";
 
@@ -227,7 +223,7 @@ public class SearchController {
 
 									if (allKeyword && !keywordOn) { // 키워드 전체검색
 										for (int n = 0; n < keywords.length; n++) {
-											if (line.indexOf(keywords[n]) != -1) {
+											if ((line.toLowerCase().contains(keywords[n].toLowerCase()) || line.toUpperCase().contains(keywords[n].toUpperCase()))) {
 
 												vo = new ParseVO();
 
@@ -239,7 +235,6 @@ public class SearchController {
 
 												vo.setComment(0);
 												vo.setKeyword(keywords[n]);
-												keywordex = keywords[n];
 												vo.setPath(fnamePath);
 												vo.setFname(fname);
 
@@ -261,7 +256,7 @@ public class SearchController {
 										// 주석일때
 										if (isComment) {
 											for (int n = 0; n < keywords.length; n++) {
-												if (line.contains(keywords[n])) {
+												if ((line.toLowerCase().contains(keywords[n].toLowerCase()) || line.toUpperCase().contains(keywords[n].toUpperCase()))) {
 													vo = new ParseVO();
 
 													code = "";
@@ -270,7 +265,6 @@ public class SearchController {
 
 													vo.setComment(1);
 													vo.setKeyword(keywords[n]);
-													keywordex = keywords[n];
 													vo.setPath(fnamePath);
 													vo.setFname(fname);
 													vo.setStart(i);
@@ -299,7 +293,7 @@ public class SearchController {
 										if (line.trim().startsWith("//")) {
 
 											for (int n = 0; n < keywords.length; n++) {
-												if (line.contains(keywords[n])) {
+												if ((line.toLowerCase().contains(keywords[n].toLowerCase()) || line.toUpperCase().contains(keywords[n].toUpperCase()))) {
 													vo = new ParseVO();
 
 													code = "";
@@ -308,7 +302,6 @@ public class SearchController {
 
 													vo.setComment(1);
 													vo.setKeyword(keywords[n]);
-													keywordex = keywords[n];
 													vo.setPath(fnamePath);
 													vo.setFname(fname);
 													vo.setStart(i);
@@ -336,8 +329,6 @@ public class SearchController {
 
 									maxLine++;
 
-									if (maxLine < 30) {
-
 										if (isCode) {
 											isBrace = (line.contains("{") || line.contains("{")) ? true : isBrace;
 										}
@@ -347,7 +338,7 @@ public class SearchController {
 												code += line + "\r\n";
 												isBrace = false;
 											}
-											if (i == k + 1) {
+											if (i == k + 1 || maxLine >= 30) {
 
 												vo.setCode(code);
 												vo.setLang(lang);
@@ -362,7 +353,6 @@ public class SearchController {
 
 												code = "";
 
-												count = 0;
 											}
 										}
 
@@ -395,7 +385,7 @@ public class SearchController {
 												}
 
 												// 브레이스 체크 스택 비었으면 코드 출력안함
-												if (checkBrace.empty() && blank) {
+												if ((checkBrace.empty() && blank) || maxLine >= 30) {
 
 													vo.setCode(code);
 													vo.setLang(lang);
@@ -415,7 +405,7 @@ public class SearchController {
 										else if (isCode && !isBrace) {
 											code += line + "\r\n";
 
-											if (i == k + 1) {
+											if (i == k + 1 || maxLine >= 30) {
 
 												vo.setCode(code);
 												vo.setLang(lang);
@@ -428,28 +418,7 @@ public class SearchController {
 												keywordOn = false;
 											}
 										}
-									} 
-									else {
-										if (isCode) {
-											code += line + "\r\n";
-										}
-										vo.setKeyword(keywordex);
-										vo.setComment(1);
-										vo.setPath(path);
-										vo.setFname(fname);
-										vo.setStart(i);
 
-										vo.setCode(code);
-										vo.setLang(lang);
-										result.add(vo);
-
-										maxLine = 0;
-										code = "";
-										tenline = false;
-										isCode = false;
-										keywordOn = false;
-										
-									}
 									// -----------------------------------------------------------------------------------------------------------
 								}
 							} // line출력 for문 끝
@@ -459,28 +428,28 @@ public class SearchController {
 
 							tenline = false; // 열줄만 출력하는 변수
 							flag = false; // 한줄에 브레이스 짝이 맞을 때.
-							count = 0;
 							keywordOn = false;
 						}
 
 						br.close();
 
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						// TODO: handle exception
 					}
 
 				} else if (f.isDirectory()) {
 					// 하위 디렉토리 존재 시 다시 탐색
-					subDirList2(f.getCanonicalPath().toString(), keyword, comment);
+					playParsing(f.getCanonicalPath().toString(), keyword, comment);
 				}
 
 			}
 
-		} catch (IOException e) {
+		} catch (final IOException e) {
 
 		}
 
 		return result;
 
 	} // subDirList2()
+
 }

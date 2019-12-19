@@ -23,18 +23,19 @@ public class ParseMapperTests {
     @Setter(onMethod_ = @Autowired)
     private ParseMapper parseMapper;
 
+
     @Test
     public void selectAllTest() {
         log.info("select test........................");
 
         SearchDTO dto = new SearchDTO();
 		
-        dto.setKeyword("조회수");
+        dto.setKeyword("별 찍기 반복문");
         dto.setLang("java");
-		
-		parseMapper.selectAll(dto).forEach(i -> {
-			log.info("" + i.getCode().replace("\r\n", "<br>"));
-		});
+        dto.setComment("c");
+        dto.setAmount(3);
+        
+        log.info("" + parseMapper.selectAll(dto));
     }
 
     @Test
@@ -86,5 +87,16 @@ public class ParseMapperTests {
 
         log.info("" + result);
         
+    }
+
+    @Test
+    public void getCount() {
+        SearchDTO dto = new SearchDTO();
+
+        dto.setKeyword("fileName");
+        dto.setComment("a");
+        dto.setLang("java sql");
+
+        log.info("카운트???????? " + parseMapper.getCount(dto));
     }
 }

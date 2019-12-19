@@ -11,10 +11,12 @@ public class PageMaker {
 	private int end;
 	private boolean prev, next;
 	private int total;
-	private PagingDTO paging;
+	
+	private SearchDTO paging;
 	
 	//객체를 만드는 제약조건 생성자
-	public PageMaker(int total, PagingDTO paging) {
+	public PageMaker(int total, SearchDTO paging) {
+
 		super();
 		this.total = total;
 		this.paging = paging;

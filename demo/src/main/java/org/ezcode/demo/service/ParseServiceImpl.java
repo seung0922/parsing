@@ -1,7 +1,6 @@
 package org.ezcode.demo.service;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.ezcode.demo.domain.ParseVO;
 import org.ezcode.demo.domain.SearchDTO;
@@ -27,9 +26,7 @@ public class ParseServiceImpl implements ParseService {
 
         log.info("select...........................");
 		
-		List<ParseVO> list = parseMapper.selectAll(dto);
-		
-		return list;
+		return parseMapper.selectAll(dto);
     }
 
     @Override
@@ -53,6 +50,14 @@ public class ParseServiceImpl implements ParseService {
         log.info("find one....................................");
 
         return parseMapper.select(dto);
+    }
+
+    @Override
+    public Integer getCount(SearchDTO dto) {
+        
+        log.info("get count....................................");
+
+        return parseMapper.getCount(dto);
     }
 
 }

@@ -74,23 +74,23 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			</div>
 
 		</div>
-		
-		<!-- 검색 결과 + input -->
-		<div class="search-result">
+
+	<!-- 검색 결과 + input -->
+	<div class="search-result">
 		<!-- 검색 input 그룹 -->
 		<div class="search-input-group">
     	<div class="input-group">
-          <input id="keywordVal" type="text" class="form-control search-input" th:value="${dto.keyword}"
+          <input id="keywordVal" type="text" class="form-control search-input" th:value="${param.keyword}"
 		  placeholder="for 반복문 if print" aria-describedby="button-addon2">
           <div class="input-group-append">
             <button id="searchBtn" class="btn btn-primary search-btn" type="button">검색 <i class="fas fa-search" aria-hidden="true"></i></button>
 		  </div>
 		</div>
-        <small>'for 반복문 if print' 검색결과가 3건 있습니다.</small>
-        </div>
-
+        <small>'[[${pm.paging.keyword}]]' 검색결과가 [[${pm.total}]]건 있습니다.</small>
+		</div>
+		
         <!-- 코드 검색결과 div -->
-        <div th:each="item : ${list}" class="code-scripter">
+        <div th:if="${list[0].keyword} != null" th:each="item : ${list}" class="code-scripter">
 			<a th:href="${item.pno}" th:text="${item.fname}"></a>
 			<span>  | <small th:text="${item.lang}"></small></span>
 			<span>  |  <i class="fab fa-github"></i> <small>github</small></span>
@@ -101,27 +101,22 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			</pre>
 			
 			</div>
-        </div>
+		</div>
 
 		<div class="page-div search-page-div">
 			<nav aria-label="Page navigation example">
 			  <ul class="pagination">
-			    <li class="page-item">
-			      <a class="page-link" href="#" aria-label="Previous">
+			    <li th:if="${pm.prev}" class="page-item">
+			      <a class="page-link" th:href="${pm.start-1}" aria-label="Previous">
 			        <span aria-hidden="true">&laquo;</span>
 			      </a>
 			    </li>
-			    <li class="page-item"><a class="page-link" href="#">1<span class="sr-only">(current)</span></a></li>
-			    <li class="page-item"><a class="page-link" href="#">2</a></li>
-			    <li class="page-item"><a class="page-link" href="#">3</a></li>
-			    <li class="page-item"><a class="page-link" href="#">4</a></li>
-			    <li class="page-item"><a class="page-link" href="#">5</a></li>
-			    <li class="page-item"><a class="page-link" href="#">6</a></li>
-			    <li class="page-item"><a class="page-link" href="#">7</a></li>
-			    <li class="page-item"><a class="page-link" href="#">8</a></li>
-			    <li class="page-item"><a class="page-link" href="#">9</a></li>
-			    <li class="page-item">
-			      <a class="page-link" href="#" aria-label="Next">
+				<li th:classappend="${pm.paging.page == num} ? active" 
+					th:each="num : ${#numbers.sequence(pm.start, pm.end)}" begin class="page-item">
+					<a class="page-link" th:href="${num}">[[${num}]]</a>
+				</li>
+			    <li th:if="${pm.next}" class="page-item">
+			      <a class="page-link" th:href="${pm.end+1}" aria-label="Next">
 			        <span aria-hidden="true">&raquo;</span>
 			      </a>
 			    </li>
@@ -132,11 +127,13 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
 		<!-- 검색어, 조건들 넣는 히든태그 -->
 		<form id="sf" method="GET" action="/search/detail">
-			<input type="text" name="pno" th:value="${dto.pno}">
-			<input type="text" name="keyword" th:value="${dto.keyword}">
-			<input type="text" name="lang" th:value="${dto.lang}">
-			<input type="text" name="siteLink" th:value="${dto.siteLink}">
-			<input type="text" name="comment" th:value="${dto.comment}">
+			<input type="hidden" name="page" th:value="${pm.paging.page}">
+			<input type="hidden" name="amount" th:value="${pm.paging.amount}">
+			<input type="hidden" name="pno" th:value="${pm.paging.pno}">
+			<input type="hidden" name="keyword" th:value="${pm.paging.keyword}">
+			<input type="hidden" name="lang" th:value="${pm.paging.lang}">
+			<input type="hidden" name="siteLink" th:value="${pm.paging.siteLink}">
+			<input type="hidden" name="comment" th:value="${pm.paging.comment}">
 		</form>
 
     	</div>
@@ -159,27 +156,30 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			indent : 2
 		});
 
-		//라디오 요소처럼 동작시킬 체크박스 그룹 셀렉터
-		$('.linkCon input[type="checkbox"]').click(function(){
-			//클릭 이벤트 발생한 요소가 체크 상태인 경우
-			if ($(this).prop('checked')) {
-				//체크박스 그룹의 요소 전체를 체크 해제후 클릭한 요소 체크 상태지정
-				$('.linkCon input[type="checkbox"]').prop('checked', false);
-				$(this).prop('checked', true);
-			}
-		});
-
-		//라디오 요소처럼 동작시킬 체크박스 그룹 셀렉터
-		$('.commentCon input[type="checkbox"]').click(function(){
-			//클릭 이벤트 발생한 요소가 체크 상태인 경우
-			if ($(this).prop('checked')) {
-				//체크박스 그룹의 요소 전체를 체크 해제후 클릭한 요소 체크 상태지정
-				$('.commentCon input[type="checkbox"]').prop('checked', false);
-				$(this).prop('checked', true);
-			}
-		});
 		
 		$(document).ready(function() {
+
+			//라디오 요소처럼 동작시킬 체크박스 그룹 셀렉터
+			$('.linkCon input[type="checkbox"]').click(function(e){
+
+				//클릭 이벤트 발생한 요소가 체크 상태인 경우
+				if ($(this).prop('checked')) {
+					//체크박스 그룹의 요소 전체를 체크 해제후 클릭한 요소 체크 상태지정
+					$('.linkCon input[type="checkbox"]').prop('checked', false);
+					$(this).prop('checked', true);
+				}
+
+				});
+
+				//라디오 요소처럼 동작시킬 체크박스 그룹 셀렉터
+				$('.commentCon input[type="checkbox"]').click(function(){
+					//클릭 이벤트 발생한 요소가 체크 상태인 경우
+					if ($(this).prop('checked')) {
+						//체크박스 그룹의 요소 전체를 체크 해제후 클릭한 요소 체크 상태지정
+						$('.commentCon input[type="checkbox"]').prop('checked', false);
+						$(this).prop('checked', true);
+					}
+				});
 
 			var $searchForm = $('#sf');
 			
@@ -268,6 +268,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 				$('#sf input[name=pno]').val(no);
 
 				$searchForm.submit();
+				
 			});
 
 
@@ -294,6 +295,23 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
 				$searchForm.submit();
 
+			});
+
+			$(".page-div ul").on("click", 'a', function(e) {
+
+				e.preventDefault();
+
+				console.log("click");
+
+				var pageNum = $(this).attr("href");
+
+				console.log("pageNum: " + pageNum);
+
+				$("input[name='page']").val(pageNum);
+
+				$searchForm.attr("action", "/search/list");
+
+				$searchForm.submit();
 			});
 
 		});

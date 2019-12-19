@@ -19,5 +19,6 @@ public interface ParseService {
     public boolean insertCode(ParseVO vo);
 
     public ParseVO findByPno(Integer pno);
-    
+
+    public Integer getCount(SearchDTO dto);    
 }

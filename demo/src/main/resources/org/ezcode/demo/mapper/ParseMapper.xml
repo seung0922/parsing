@@ -5,6 +5,24 @@
 
 <mapper namespace="org.ezcode.demo.mapper.ParseMapper">
 
+<select id="getCount" resultType="Integer">
+    select count(*)
+    from tbl_parsing
+    where pno > 0
+    <foreach collection="keywords" item="keyword" open="and(" close=")" separator="or">
+        keyword = #{keyword}
+    </foreach>
+    <foreach collection="langs" item="lang" open="and(" close=")" separator="or">
+        lang = #{lang}
+    </foreach>
+    <if test="comment eq 'a'.toString()">
+        and comment = 0
+    </if>
+    <if test="comment eq 'c'.toString()">
+        and comment = 1
+    </if>
+</select>
+
 <select id="selectAll" resultType="org.ezcode.demo.domain.ParseVO">
     select *
     from tbl_parsing
@@ -21,7 +39,7 @@
     <if test="comment eq 'c'.toString()">
         and comment = 1
     </if>
-    limit 0,20
+    limit #{skip}, #{amount}
 </select>
 
 <select id="select" resultType="org.ezcode.demo.domain.ParseVO">

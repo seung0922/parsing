@@ -12,7 +12,7 @@ public interface ParseMapper {
 
     // keyword 여러개 찾음
     public List<ParseVO> selectAll(SearchDTO dto);
-    
+
     // keyword 한개만 찾음
     public List<ParseVO> select(SearchDTO dto);
 
@@ -20,5 +20,6 @@ public interface ParseMapper {
     
     public ParseVO selectByPno(Integer pno);
 
+    public Integer getCount(SearchDTO dto);
     
 }

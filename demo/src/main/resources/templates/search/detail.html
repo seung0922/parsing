@@ -19,16 +19,16 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
          <div class="code-scripter">
          	<!-- 코드 정보 영역 -->
          	<div class="code-info">
-				<a href="#" th:text="${result.fname}"></a>
+				<a id="fname" href="#" th:text="${result.fname}"></a>
 				<span> | <small th:text="${result.lang}"></small></span>
 				<span> | <i class="fab fa-github"></i> <small>github</small></span>
-				<span> | <small>47 lines</small></span>
+				<span> | <small id="lineCnt"></small></span>
 				<span> |
 					<small>
-						<a href="#">https://github.com/for/star/for-star.java</a>
-						(깃허브코드면 저장소 주소)
+						<a id="gitPath" href="" target="_blank"></a>
 					</small>
 				</span>
+				<input id="hpath" type="hidden" th:value=${result.path}>
 
 				<div class="sdetail-btns">
 					<button class="btn btn-sm btn-primary btn-outline-primary tbtn">
@@ -51,7 +51,10 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			</div>
 
 		</div>
+		
 		<form id="sf" method="GET" action="/search/list">
+			<input type="hidden" name="page" th:value="${param.page}">
+			<input type="hidden" name="amount" th:value="${param.amount}">
 			<input type="hidden" name="pno" th:value="${param.pno}">
 			<input type="hidden" name="keyword" th:value="${param.keyword}">
 			<input type="hidden" name="lang" th:value="${param.lang}">
@@ -79,49 +82,64 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			theme: 'enlighter',
 			indent : 2
         });
-		$(document).ready(function() {
 
+		$(document).ready(function() {
 			
 			// enlighter div 자식 태그에 검색 키워드 존재 시 강조 표시
-        // .enlighter div div span - 단어마다 span 태그로 감싸져 있음
-        var keyword = $('#sf input[name=keyword]').val();
-		var keyArr = keyword.split(" ");
-        var len = $('.enlighter div div span').length;
-		
-		// 키워드 여러개인 경우
-        for (var j = 0; j < keyArr.length; j++) {
-			for (var i = 0; i < len; i++) {
-				// 검색결과 코드에 검색 키워드 존재하면
-	        	if ($('.enlighter div div span').eq(i).html().indexOf(keyArr[j]) != -1) {
-					//if ($('.enlighter div div span').eq(i).html() === keyArr[j]) {
-						
-						// 태그안에 여러개 단어 있을때 - 키워드에만 표시
-						var codeText = $('.enlighter div div span').eq(i).html();
-						if ($('.enlighter div div span').eq(i).html() != keyArr[j]) {
+			// .enlighter div div span - 단어마다 span 태그로 감싸져 있음
+			var keyword = $('#sf input[name=keyword]').val();
+			var keyArr = keyword.split(" ");
+			var len = $('.enlighter div div span').length;
+			
+				// 키워드 여러개인 경우
+				for (var j = 0; j < keyArr.length; j++) {
+					for (var i = 0; i < len; i++) {
+						// 검색결과 코드에 검색 키워드 존재하면
+						if ($('.enlighter div div span').eq(i).html().indexOf(keyArr[j]) != -1) {
+							//if ($('.enlighter div div span').eq(i).html() === keyArr[j]) {
 							
-							var codeArr = $('.enlighter div div span').eq(i).html().split(keyArr[j]);
-							
-							$('.enlighter div div span')
-							.eq(i)
-							.html(
-								codeArr[0] 
-								+'<em style="color:#333; background-color:#faf093; font-weight: 900;">' 
-									+ keyArr[j] + '</em>'+ codeArr[1]);
-						} else {
-							// css 스타일 변경
-							$('.enlighter div div span').eq(i).css("color", "#333");
-							$('.enlighter div div span').eq(i).css("background-color", "#faf093");
-							$('.enlighter div div span').eq(i).css("font-weight", "900");
+							// 태그안에 여러개 단어 있을때 - 키워드에만 표시
+							var codeText = $('.enlighter div div span').eq(i).html();
+							if ($('.enlighter div div span').eq(i).html() != keyArr[j]) {
+								
+								var codeArr = $('.enlighter div div span').eq(i).html().split(keyArr[j]);
+								
+								$('.enlighter div div span')
+								.eq(i)
+								.html(
+									codeArr[0] 
+									+'<em style="color:#333; background-color:#faf093; font-weight: 900;">' 
+										+ keyArr[j] + '</em>'+ codeArr[1]);
+							} else {
+								// css 스타일 변경
+								$('.enlighter div div span').eq(i).css("color", "#333");
+								$('.enlighter div div span').eq(i).css("background-color", "#faf093");
+								$('.enlighter div div span').eq(i).css("font-weight", "900");
+							}
 						}
 					}
 				}
-			}
-			
-		});
+				
+				// 목록
+				$('#listBtn').on("click", function() {
+					$('#sf').submit();
+				});
 
-		$('#listBtn').on("click", function() {
-			$('#sf').submit();
-		});
+				// 깃허브 주소
+				var fname = $('#fname').text();
+				var str = $('#hpath').val();
+
+				str = str.replace(/\\/gi, "/");
+				str = str.replace("C:/ezcode", "github.com");
+				str = str.replace("-master", "/blob/master");
+				str = "https://www." + str + "/" + fname;
+
+				$('#gitPath').text(str);
+				$('#gitPath').attr('href', str);
+
+				$('#lineCnt').text($('.enlighter').children().length);
+			});
+
 
 	</script>
 </div>

@@ -142,13 +142,12 @@ header a {
 			  </div>
 
 			<!-- 검색어, 조건들 넣는 히든태그 -->
-			<form id="sf" method="POST">
+			<form id="sf" method="GET" action="/search/list">
 			  <input type="hidden" name="keyword">
 			  <input type="hidden" name="lang">
 			  <input type="hidden" name="siteLink">
 			  <input type="hidden" name="comment">
 			</form>
-
               
 			<!-- 조건 -->
 			<p class="search-title">조건  &nbsp;<i class="fas fa-sort-down"></i></p>
@@ -157,7 +156,7 @@ header a {
 					<div class="search-check langCon">
 					<p>언어</p>
 					<div class="custom-control custom-checkbox">
-					    <input type="checkbox" class="custom-control-input" id="JAVA" value="java" checked>
+					    <input type="checkbox" class="custom-control-input" id="JAVA" value="java">
 					    <label class="custom-control-label" for="JAVA">JAVA</label>
 					</div>
 					<div class="custom-control custom-checkbox">
@@ -229,6 +228,9 @@ $('.search-title').on('click', function() {
 });
 
 $(document).ready(function() {
+
+	$('.langCon input[type="checkbox"]').eq(0).prop('checked',true);
+
 	$('.js-sticky-header').removeClass('sticky-custom');
 	$('.js-sticky-header').removeClass('shrink');
 	$('.sticky-custom-m-span').removeClass('sticky-custom-m-icon');
@@ -263,6 +265,45 @@ $(window).scroll(function() {
 
 <!-- 검색 조건 처리 -->
 <script>
+
+var $langCon = $('.langCon input[type="checkbox"]');
+
+// if($('.langCon input[type="checkbox"]:checked').length === 1) {
+
+// 	$('.langCon input[type="checkbox"]:checked').on('click', function() {
+// 		// alert($(this).attr('type'));
+// 		$(this).prop('checked', true);
+// 	});
+
+// }
+
+var $linkCon = $('.linkCon input[type="checkbox"]');
+
+$linkCon.change(function(){
+
+	$linkCon.each(function() {
+
+		if($(this).is(':checked')) {
+			$(this).on('click', function() {
+				$(this).prop('checked', true);
+			});
+		}
+	});
+});
+
+var $commentCon = $('.commentCon input[type="checkbox"]');
+
+$commentCon.change(function(){
+
+	$commentCon.each(function() {
+
+		if($(this).is(':checked')) {
+			$(this).on('click', function() {
+				$(this).prop('checked', true);
+			});
+		}
+	});
+});
 
 //라디오 요소처럼 동작시킬 체크박스 그룹 셀렉터
 $('.linkCon input[type="checkbox"]').click(function(){
@@ -333,5 +374,5 @@ $('#searchBtn').on('click', function() {
 		loop: true,
 		showCursor: true
 	});
-    </script>
-	</div>
+</script>
+</div>
