@@ -14,18 +14,21 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	    	<p>내용을 작성해주세요.</p>
 	    </div>
 		</div> -->
-		
     	<div class="search-container">
          <div class="code-scripter">
          	<!-- 코드 정보 영역 -->
          	<div class="code-info">
 				<a id="fname" href="#" th:text="${result.fname}"></a>
 				<span> | <small th:text="${result.lang}"></small></span>
-				<span> | <i class="fab fa-github"></i> <small>[[${param.siteLink}]]</small></span>
+				<span th:if="${param.siteLink.toString().equals('github')}" >  |  <i class="fab fa-github"></i> <small>[[${param.siteLink}]]</small>
+				</span>
+				<span th:if="${param.siteLink.toString().equals('google')}" >  |  <i class="fab fa-google"></i> <small>[[${param.siteLink}]]</small>
+				</span>
 				<span> | <small id="lineCnt"></small></span>
 				<span> |
 					<small>
-						<a id="gitPath" href="" target="_blank"></a>
+						<a th:if="${param.siteLink.toString().equals('github')}" id="pathLink" th:href="${param.siteLink}" target="_blank"></a>
+						<a th:if="${param.siteLink.toString().equals('google')}" id="pathLink" th:href="${result.path}" th:text="${result.path}" target="_blank"></a>
 					</small>
 				</span>
 				<input id="hpath" type="hidden" th:value=${result.path}>
@@ -136,18 +139,24 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 					$('#sf').submit();
 				});
 
-				// 깃허브 주소
-				var fname = $('#fname').text();
-				var str = $('#hpath').val();
+				// 해당 코드 주소 가기
+				var $pathLink = $('#pathLink');
 
-				str = str.replace(/\\/gi, "/");
-				str = str.replace("C:/ezcode", "github.com");
-				str = str.replace("-master", "/blob/master");
-				str = "https://www." + str + "/" + fname;
+				if($pathLink.attr("href") === "github") {
+					var fname = $('#fname').text();
+					var str = $('#hpath').val();
 
-				$('#gitPath').text(str);
-				$('#gitPath').attr('href', str);
+					str = str.replace(/\\/gi, "/");
+					str = str.replace("C:/ezcode", "github.com");
+					str = str.replace("-master", "/blob/master");
+					str = "https://www." + str + "/" + fname;
 
+					$pathLink.text(str);
+					$pathLink.attr('href', str);
+
+				}
+
+				// 총 라인 수
 				$('#lineCnt').text($('.enlighter').children().length);
 			});
 

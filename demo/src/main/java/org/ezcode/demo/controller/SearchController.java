@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Stack;
 import java.util.stream.Stream;
 
-import javax.lang.model.util.Elements;
-
 import org.ezcode.demo.domain.PageMaker;
 import org.ezcode.demo.domain.ParseVO;
 import org.ezcode.demo.domain.SearchDTO;
@@ -21,8 +19,6 @@ import org.ezcode.demo.service.ParseService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.Jsoup;
-import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,6 +39,8 @@ public class SearchController {
 
 	private List<ParseVO> result = new ArrayList<ParseVO>();
 
+	private List<ParseVO> list = new ArrayList<>();
+
 	@GetMapping("/index")
 	public void search() {
 		log.info("get index....");
@@ -56,19 +54,17 @@ public class SearchController {
 	@GetMapping("/list")
 	public void searchList(@ModelAttribute("dto") SearchDTO dto, Model model) {
 		
-		List<ParseVO> list = new ArrayList<>();
-
+		list = new ArrayList<>();
 		
 		String[] keywordArr = dto.getKeywords();
 
-		// 1. github 검색일 때
-
+		// 1. 키워드 없을 때
 		if(dto.getKeyword().equals("")) {
 
 			model.addAttribute("count", 0);
 			model.addAttribute("list", new ParseVO());
 
-		} else {
+		} else { // 2. 키워드 있을 때
 
 			log.info("parse get..........................");
 			log.info("searchDTO: " + dto);
@@ -77,8 +73,7 @@ public class SearchController {
 
 			log.info("kk??????????????????....." + kk);
 
-			// 키워드를 하나씩 찾아서 없으면 db에 넣는다
-
+			// 2-1. 깃허브 검색일 때
 			if(dto.getSiteLink().equals("github")){
 
 				Stream.of(keywordArr).forEach(k -> {
@@ -119,10 +114,12 @@ public class SearchController {
 				
 				model.addAttribute("list", parseService.findAll(dto));
 				model.addAttribute("pm", new PageMaker(parseService.getCount(dto), dto));
+
 			}
 
+			// 2-1. 티스토리 검색일 때 ( 크롤링 - DB에 넣지않고 결과만 보여줌 )
+			if(dto.getSiteLink().equals("google")) {
 
-			if(dto.getSiteLink().equals("google")){
 				Stream.of(keywordArr).forEach(k -> {
 	
 					// 키워드 한개로 지정해놓는다.
@@ -133,24 +130,34 @@ public class SearchController {
 	
 					result = (crawling(dto.getKeyword(), dto.getLang()));
 
-					list.addAll(result);
-
+					
+					list.addAll(crawling(dto.getKeyword(), dto.getLang()));
+					
+					
 				});
-			
+				
+				for(int n=0; n<list.size(); n++) {
+					list.get(n).setPno(n);
+					log.info("헐.........pno를 이렇게 한다고????????????????...." + n);
+				}
+
+
+				int pnum = dto.getPage() * dto.getAmount();
+				
+				List<ParseVO> pagingList = new ArrayList<ParseVO>();
+
+				for(int i = (pnum - dto.getAmount()); i < pnum; i++) {
+					pagingList.add(list.get(i));
+				}
+
 				log.info("list.....................???");
-				// log.info("" + list);
+				log.info("" + list);
+				log.info("list 사이즈.....................?!?!?!?!!?!?!!?!??!" + list.size());
 		
-				model.addAttribute("list", list);
+				model.addAttribute("list", pagingList);
 				model.addAttribute("pm", new PageMaker(list.size(), dto));
 			}
-	
-	
-	
 		}
-
-		//----------------------------------------------------------------
-		// 2. google 검색일때
-
 	}
 
 	@GetMapping("/detail")
@@ -159,10 +166,17 @@ public class SearchController {
 		log.info("get index...............................");
 
 		log.info("" + dto);
+		
+		if(dto.getSiteLink().equals("github")){
 
-		ParseVO result = parseService.findByPno(dto.getPno());
+			model.addAttribute("result", parseService.findByPno(dto.getPno()));
 
-		model.addAttribute("result", result);
+		} else if(dto.getSiteLink().equals("google")){
+
+			model.addAttribute("result", list.get(dto.getPno()));
+		}
+
+
 	}
 
 	// ----------------------------------------------------------------------------
@@ -497,22 +511,15 @@ public class SearchController {
 
 	} // subDirList2()
 
-	public List<ParseVO> crawling(String keyword, String lang) {
+	public List<ParseVO> crawling(String keyword, String langs) {
 		ParseVO vo = new ParseVO();
 
 		int cnt = 0;
 		String[] ran = {"반복", "포", "조건", "이프"};
-		// String grammers = keyword; // 여기 넣어주면 됨
-		
-		// vo.setComment(0);
-		// vo.setKeyword(keyword);
-		// vo.setFname("tistory");
-		// vo.setLang(lang);
-
 
 		int page = 1;
 
-		String langs = lang; // 여기도
+		//String langs = lang; // 여기도
 
 		for(int i = 0; i < ran.length; i++) {
 			if(keyword.contains(ran[i])) {
@@ -560,17 +567,13 @@ public class SearchController {
 			org.jsoup.select.Elements element = doc.select(str);
 			for (Element el : element) {
 
-//					System.out.println(el.attr("abs:href"));
 				String url2 = el.attr("abs:href");
-				// log.info("ㅇㄹㅇㄹㅇㄹㅇㄹ " + url2);
-				// vo.setPath(url2);
 
 				String[] str2 = { "pre", ".colorscripter-code td:nth-child(2) div:nth-child(1)" };
 				try {
 					doc2 = Jsoup.connect(url2).userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36").get();
-					// log.info("dfdfdfdfdfdf   " + doc2);
+				
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -579,10 +582,10 @@ public class SearchController {
 					if (!str2[i].equals("pre")) {
 						for (Element el2 : element2) { // 하위 뉴스 기사들을 for문 돌면서 출력
 							for (Element al2 : el2.select("div div")) {
-								// log.info("ddddd" + al2.text());
+								
 								vo = new ParseVO();
 				
-								crawlingParse(al2.text(), grammer, vo, lang, url2);
+								crawlingParse(al2.text(), grammer, vo, langs, url2);
 								middle = System.currentTimeMillis();
 								if(middle - start >= 1000) {
 									break;
@@ -592,11 +595,9 @@ public class SearchController {
 					} else {
 						for (Element el2 : element2) { // 하위 뉴스 기사들을 for문 돌면서 출력
 							
-							// log.info("ddddd" + el2.text());
 							vo = new ParseVO();
-			
 							
-							crawlingParse(el2.text(), grammer, vo, lang, url2);
+							crawlingParse(el2.text(), grammer, vo, langs, url2);
 							middle = System.currentTimeMillis();
 							if(middle - start >= 1000) {
 								break;
@@ -607,7 +608,7 @@ public class SearchController {
 
 			}
 			page += 1;
-		} while (page == 5);
+		} while (page <= 5);
 
 		long end = System.currentTimeMillis() - start;
 		
@@ -619,7 +620,9 @@ public class SearchController {
 	}
 
 	public void crawlingParse(String all, String[] grammer, ParseVO vo, String lang, String url2) {
+
 		String str = "";
+
 		boolean allKeyword = true; // 모든 키워드 찾는 변수
 		boolean keywordOn = false;
 		
@@ -627,8 +630,6 @@ public class SearchController {
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		
-
-		// log.info("" + all);
 
 		try {
 
@@ -648,14 +649,17 @@ public class SearchController {
 			int tbrace = 0;
 			int k = 0;
 
+
 			// 한줄씩 읽어온다
 			for (int i = 1; (line = br.readLine()) != null; i++) {
+
 				vo = new ParseVO();
+				
 				vo.setComment(0);
 				vo.setFname("tistory");
 				vo.setLang(lang);
 				vo.setPath(url2);
-				// log.info("" + line);
+				
 				if (!line.trim().startsWith("import ") && !line.trim().startsWith("public") && !line.trim().startsWith("package")) {
 
 					int open = 0; // 한 줄에 { 갯수
@@ -678,10 +682,11 @@ public class SearchController {
 
 					// if (allKeyword) { // 키워드 전체검색
 						for (int n = 0; n < grammer.length; n++) {
-							if ((line.toLowerCase().contains(grammer[n].trim().toLowerCase()) || line.toUpperCase().contains(grammer[n].trim().toUpperCase())) && keywordOn == false) {
+							if ((line.toLowerCase().contains(grammer[n].trim().toLowerCase()) 
+									|| line.toUpperCase().contains(grammer[n].trim().toUpperCase())) 
+										&& keywordOn == false) {
 								keywordOn = true;
 								str = grammer[n];
-
 
 								code = "";
 
@@ -705,11 +710,12 @@ public class SearchController {
 							isBrace = false;
 						}
 						if (i == k + 1) {
+
 							vo.setStart(i);			
 							vo.setCode(code);
 							vo.setKeyword(str);
 							result.add(vo);
-							// log.info("씨엔티 " + cnt++);
+
 							code = "";
 							flag = false;
 							isBrace = false;
@@ -723,8 +729,6 @@ public class SearchController {
 					else if (isCode && isBrace) {
 
 						code += line + "\n";
-//									System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-//									System.out.println(code);
 
 						// 코드는 시작했다.
 						// 브레이스가 열려있다.
@@ -749,11 +753,12 @@ public class SearchController {
 							}
 
 							if (checkBrace.empty() && blank) {
+								
 								vo.setStart(i);			
 								vo.setCode(code);
 								vo.setKeyword(str);
 								result.add(vo);
-								// log.info("씨엔티 " + cnt++);
+								
 								code = "";
 								isBrace = false;
 								isCode = false;
@@ -770,11 +775,12 @@ public class SearchController {
 						code += line + "\n";
 
 						if (i == k + 1) {
+
 							vo.setStart(i);			
 							vo.setCode(code);
 							vo.setKeyword(str);
 							result.add(vo);
-							// log.info("씨엔티 " + cnt++);
+							
 							code = "";
 							tenline = false;
 							isCode = false;
@@ -784,6 +790,7 @@ public class SearchController {
 					continue;
 				} // 임포트 방지
 			} // line출력 for문 끝
+
 			isCode = false; // 검색에 해당되는 코드
 			isBrace = false; // 브레이스
 
@@ -800,8 +807,6 @@ public class SearchController {
 	} // subDirList()
 
 	public static String cut(String kw) {
-		
-		
 
 		if(kw.equals("반복") || kw.equals("포")) {
 			return kw = kw.replace(kw, "for");
@@ -810,7 +815,7 @@ public class SearchController {
 		if(kw.equals("조건") || kw.equals("이프")) {
 			return kw = kw.replace(kw, "if");
 		}
-	
+
 		return kw;	
 	}
 }
