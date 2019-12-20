@@ -13,7 +13,7 @@ public class SearchDTO {
 
 	private Integer pno;
     private String keyword;
-    private String lang;
+	private String lang;
     private String siteLink;
 	private String comment;
 

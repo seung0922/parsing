@@ -39,7 +39,7 @@ public class SearchController {
 
 	private List<ParseVO> result = new ArrayList<ParseVO>();
 
-	private List<ParseVO> list = new ArrayList<>();
+	//private List<ParseVO> list = new ArrayList<>();
 
 	@GetMapping("/index")
 	public void search() {
@@ -54,10 +54,8 @@ public class SearchController {
 	@GetMapping("/list")
 	public void searchList(@ModelAttribute("dto") SearchDTO dto, Model model) {
 		
-		list = new ArrayList<>();
-		
 		String[] keywordArr = dto.getKeywords();
-
+		
 		// 1. 키워드 없을 때
 		if(dto.getKeyword().equals("")) {
 
@@ -73,90 +71,51 @@ public class SearchController {
 
 			log.info("kk??????????????????....." + kk);
 
-			// 2-1. 깃허브 검색일 때
-			if(dto.getSiteLink().equals("github")){
+			Stream.of(keywordArr).forEach(k -> {
 
-				Stream.of(keywordArr).forEach(k -> {
+				// 키워드 한개로 지정해놓는다.
+				dto.setKeyword(k);
 
-					// 키워드 한개로 지정해놓는다.
-					dto.setKeyword(k);
+				// 파싱한 결과 저장하는 리스트
+				result = new ArrayList<ParseVO>();
 
-					// 파싱한 결과 저장하는 리스트
-					result = new ArrayList<ParseVO>();
+				// 키워드 하나 지정한 걸로 검색했는데 null 뜨면
+				if (parseService.find(dto).isEmpty()) {
 
-					// 키워드 하나 지정한 걸로 검색했는데 null 뜨면
-					if (parseService.find(dto).isEmpty()) {
+					log.info("널임");
 
-						log.info("널임");
+					// 2-1. 검색 사이트 github일 때
+					if(dto.getSiteLink().equals("github")) {
 
 						// 1파일 저장된 경로에서 해당키워드로 파싱한 다음 DB에 저장시킴
-						final String saveDir = "C:\\ezcode";
-
+						String saveDir = "C:\\ezcode";
 						log.info("keyword..........................." + k);
-
+	
 						result = playParsing(saveDir, k, dto.getComment(), dto.getLangs());
+						
+					} else { // 2-2. 검색사이트 google일 때
+						result = ( crawling(dto.getKeyword(), dto.getLang()) );
+					}
 
-						log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-						log.info("" + result);
-						log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+					log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+					log.info("" + result);
+					log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
-						result.forEach(r -> {
-							log.info("" + r);
-							parseService.insertCode(r);
-						});
+					result.forEach(r -> {
+						log.info("" + r);
+						parseService.insertCode(r);
+					});
 
-					} 
+				} 
 
-				});
+			});
 
-				// 총 결과 개수
-				dto.setKeyword(kk);
-				
-				model.addAttribute("list", parseService.findAll(dto));
-				model.addAttribute("pm", new PageMaker(parseService.getCount(dto), dto));
+			// 총 결과 개수
+			dto.setKeyword(kk);
+			
+			model.addAttribute("list", parseService.findAll(dto));
+			model.addAttribute("pm", new PageMaker(parseService.getCount(dto), dto));
 
-			}
-
-			// 2-1. 티스토리 검색일 때 ( 크롤링 - DB에 넣지않고 결과만 보여줌 )
-			if(dto.getSiteLink().equals("google")) {
-
-				Stream.of(keywordArr).forEach(k -> {
-	
-					// 키워드 한개로 지정해놓는다.
-					// dto.setKeyword(k);
-	
-					// 파싱한 결과 저장하는 리스트
-					result = new ArrayList<ParseVO>();
-	
-					result = (crawling(dto.getKeyword(), dto.getLang()));
-
-					
-					list.addAll(crawling(dto.getKeyword(), dto.getLang()));
-					
-					
-				});
-				
-				for(int n=0; n<list.size(); n++) {
-					list.get(n).setPno(n);
-					log.info("헐.........pno를 이렇게 한다고????????????????...." + n);
-				}
-
-
-				int pnum = dto.getPage() * dto.getAmount();
-				
-				List<ParseVO> pagingList = new ArrayList<ParseVO>();
-
-				for(int i = (pnum - dto.getAmount()); i < pnum; i++) {
-					pagingList.add(list.get(i));
-				}
-
-				log.info("list.....................???");
-				log.info("" + list);
-				log.info("list 사이즈.....................?!?!?!?!!?!?!!?!??!" + list.size());
-		
-				model.addAttribute("list", pagingList);
-				model.addAttribute("pm", new PageMaker(list.size(), dto));
-			}
 		}
 	}
 
@@ -167,15 +126,7 @@ public class SearchController {
 
 		log.info("" + dto);
 		
-		if(dto.getSiteLink().equals("github")){
-
-			model.addAttribute("result", parseService.findByPno(dto.getPno()));
-
-		} else if(dto.getSiteLink().equals("google")){
-
-			model.addAttribute("result", list.get(dto.getPno()));
-		}
-
+		model.addAttribute("result", parseService.findByPno(dto.getPno()));
 
 	}
 
@@ -196,10 +147,6 @@ public class SearchController {
 		}
 
 		final String[] keywords = keyword.split(",");
-
-		// Stream.of(keyword).forEach(y -> {
-		// System.out.println("개발 끝났져?? " + y);
-		// });
 
 		final File file = new File(path);
 
@@ -291,6 +238,7 @@ public class SearchController {
 
 													maxLine = 0;
 
+													vo.setSiteLink("github");
 													vo.setComment(0);
 													vo.setKeyword(keywords[n]);
 													vo.setPath(fnamePath);
@@ -321,6 +269,7 @@ public class SearchController {
 
 														maxLine = 0;
 
+														vo.setSiteLink("github");
 														vo.setComment(1);
 														vo.setKeyword(keywords[n]);
 														vo.setPath(fnamePath);
@@ -358,6 +307,7 @@ public class SearchController {
 
 														maxLine = 0;
 
+														vo.setSiteLink("github");
 														vo.setComment(1);
 														vo.setKeyword(keywords[n]);
 														vo.setPath(fnamePath);
@@ -585,7 +535,7 @@ public class SearchController {
 								
 								vo = new ParseVO();
 				
-								crawlingParse(al2.text(), grammer, vo, langs, url2);
+								crawlingParse(al2.text(), grammer, vo, langs, url2, el.nextElementSibling().text());
 								middle = System.currentTimeMillis();
 								if(middle - start >= 1000) {
 									break;
@@ -597,7 +547,7 @@ public class SearchController {
 							
 							vo = new ParseVO();
 							
-							crawlingParse(el2.text(), grammer, vo, langs, url2);
+							crawlingParse(el2.text(), grammer, vo, langs, url2, el.nextElementSibling().text());
 							middle = System.currentTimeMillis();
 							if(middle - start >= 1000) {
 								break;
@@ -619,7 +569,7 @@ public class SearchController {
 		return result;
 	}
 
-	public void crawlingParse(String all, String[] grammer, ParseVO vo, String lang, String url2) {
+	public void crawlingParse(String all, String[] grammer, ParseVO vo, String lang, String url2, String fname) {
 
 		String str = "";
 
@@ -655,8 +605,9 @@ public class SearchController {
 
 				vo = new ParseVO();
 				
+				vo.setSiteLink("google");
 				vo.setComment(0);
-				vo.setFname("tistory");
+				vo.setFname(fname);
 				vo.setLang(lang);
 				vo.setPath(url2);
 				
@@ -818,4 +769,5 @@ public class SearchController {
 
 		return kw;	
 	}
+
 }

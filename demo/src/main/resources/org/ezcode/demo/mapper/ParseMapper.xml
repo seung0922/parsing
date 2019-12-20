@@ -12,15 +12,21 @@
     <foreach collection="keywords" item="keyword" open="and(" close=")" separator="or">
         keyword = #{keyword}
     </foreach>
-    <foreach collection="langs" item="lang" open="and(" close=")" separator="or">
-        lang = #{lang}
-    </foreach>
+    <if test="siteLink eq 'github'.toString()">
+        <foreach collection="langs" item="lang" open="and(" close=")" separator="or">
+            lang = #{lang}
+        </foreach>
+    </if>
+    <if test="siteLink eq 'google'.toString()">
+        and lang = #{lang}
+    </if>
     <if test="comment eq 'a'.toString()">
         and comment = 0
     </if>
     <if test="comment eq 'c'.toString()">
         and comment = 1
     </if>
+    and siteLink = #{siteLink}
 </select>
 
 <select id="selectAll" resultType="org.ezcode.demo.domain.ParseVO">
@@ -30,15 +36,21 @@
     <foreach collection="keywords" item="keyword" open="and(" close=")" separator="or">
         keyword = #{keyword}
     </foreach>
-    <foreach collection="langs" item="lang" open="and(" close=")" separator="or">
-        lang = #{lang}
-    </foreach>
+    <if test="siteLink eq 'github'.toString()">
+        <foreach collection="langs" item="lang" open="and(" close=")" separator="or">
+            lang = #{lang}
+        </foreach>
+    </if>
+    <if test="siteLink eq 'google'.toString()">
+        and lang = #{lang}
+    </if>
     <if test="comment eq 'a'.toString()">
         and comment = 0
     </if>
     <if test="comment eq 'c'.toString()">
         and comment = 1
     </if>
+    and siteLink = #{siteLink}
     limit #{skip}, #{amount}
 </select>
 
@@ -47,20 +59,26 @@
     from tbl_parsing
     where pno > 0
     and keyword = #{keyword}
-    <foreach collection="langs" item="lang" open="and(" close=")" separator="or">
-        lang = #{lang}
-    </foreach>
+    <if test="siteLink eq 'github'.toString()">
+        <foreach collection="langs" item="lang" open="and(" close=")" separator="or">
+            lang = #{lang}
+        </foreach>
+    </if>
+    <if test="siteLink eq 'google'.toString()">
+        and lang = #{lang}
+    </if>
     <if test="comment eq 'a'.toString()">
         and comment = 0
     </if>
     <if test="comment eq 'c'.toString()">
         and comment = 1
     </if>
+    and siteLink = #{siteLink}
 </select>
 
 <insert id="insertCode">
-    insert into tbl_parsing (keyword, comment, code, lang, path, fname, start)
-    values (#{keyword}, #{comment}, #{code}, #{lang}, #{path}, #{fname}, #{start})
+    insert into tbl_parsing (keyword, comment, code, lang, siteLink, path, fname, start)
+    values (#{keyword}, #{comment}, #{code}, #{lang}, #{siteLink}, #{path}, #{fname}, #{start})
 </insert>
 
 <select id="selectByPno" resultType="org.ezcode.demo.domain.ParseVO">

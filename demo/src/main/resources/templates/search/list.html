@@ -82,27 +82,21 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
         <small>'[[${pm.paging.keyword}]]' 검색결과가 [[${pm.total}]]건 있습니다.</small>
 		</div>
 
-		<!-- [[${list}]]dcdcdcdcd
-		[[${pm}]] -->
-		
 		<!-- 코드 검색결과 div -->
-		<!-- <div th:if="${param.siteLink.toString().equals('github')}"> -->
-			<div th:if="${list[0].keyword} != null" th:each="item : ${list}" class="code-scripter">
-				<a th:href="${item.pno}" th:text="${item.fname}"></a>
-				<span>  | <small th:text="${item.lang}"></small></span>
-				<span th:if="${param.siteLink.toString().equals('github')}" >  |  <i class="fab fa-github"></i> <small>[[${param.siteLink}]]</small>
-				</span>
-				<span th:if="${param.siteLink.toString().equals('google')}" >  |  <i class="fab fa-google"></i> <small>[[${param.siteLink}]]</small>
-				</span>
-				<!-- 코드 영역 -->
-				<div class="code-content">
-				
+		<!-- 깃허브 검색일때................ -->
+		<div th:if="${list[0].keyword} != null" th:each="item : ${list}" class="code-scripter">
+			<a th:href="${item.pno}" th:text="${item.fname}"></a>
+			<span>  | <small th:text="${item.lang}"></small></span>
+			<span>  |  <i class="fab fa-github"></i> <small>[[${param.siteLink}]]</small>
+			</span>
+			<!-- 코드 영역 -->
+			<div class="code-content">
+			
 				<pre th:data-enlighter-language="${item.lang}" th:text="${item.code}" th:data-enlighter-lineoffset="${item.start}">
 				</pre>
-				
-				</div>
+			
 			</div>
-		<!-- </div> -->
+		</div>
 
 		<div class="page-div search-page-div">
 			<nav aria-label="Page navigation example">
@@ -128,13 +122,13 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
 		<!-- 검색어, 조건들 넣는 히든태그 -->
 		<form id="sf" method="GET" action="/search/detail">
-			<input type="text" name="page" th:value="${pm.paging.page}">
-			<input type="text" name="amount" th:value="${pm.paging.amount}">
-			<input type="text" name="pno" th:value="${pm.paging.pno}">
-			<input type="text" name="keyword" th:value="${pm.paging.keyword}">
-			<input type="text" name="lang" th:value="${pm.paging.lang}">
-			<input type="text" name="siteLink" th:value="${pm.paging.siteLink}">
-			<input type="text" name="comment" th:value="${pm.paging.comment}">
+			<input type="hidden" name="page" th:value="${pm.paging.page}">
+			<input type="hidden" name="amount" th:value="${pm.paging.amount}">
+			<input type="hidden" name="pno" th:value="${pm.paging.pno}">
+			<input type="hidden" name="keyword" th:value="${pm.paging.keyword}">
+			<input type="hidden" name="lang" th:value="${pm.paging.lang}">
+			<input type="hidden" name="siteLink" th:value="${pm.paging.siteLink}">
+			<input type="hidden" name="comment" th:value="${pm.paging.comment}">
 		</form>
 
     	</div>
@@ -142,8 +136,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     </section>
 	
 	<!-- EnlighterJS -->
-    <script type="text/javascript" th:src="@{/js/enlighterjs.min.js}"></script>
-	
+	<script type="text/javascript" th:src="@{/js/enlighterjs.min.js}"></script>
+
     <!-- Init Code -->
     <script type="text/javascript">
         // - highlight all pre + code tags (CSS3 selectors)
@@ -331,10 +325,9 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 				$searchForm.submit();
 
 			});
-
 		});
 			
-		</script>
+	</script>
 
 </div>
 
