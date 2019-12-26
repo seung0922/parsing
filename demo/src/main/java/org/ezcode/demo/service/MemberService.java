@@ -7,6 +7,6 @@ import org.ezcode.demo.domain.MemberVO;
  */
 public interface MemberService {
 
-    public void join(MemberVO vo);
-    
+    public boolean join(MemberVO vo);
+
 }

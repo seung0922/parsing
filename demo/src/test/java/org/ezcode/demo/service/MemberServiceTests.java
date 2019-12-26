@@ -17,6 +17,7 @@ public class MemberServiceTests {
 
     @Autowired
     private MemberService memberService;
+    
     @Autowired
     private BCryptPasswordEncoder encoder;
 

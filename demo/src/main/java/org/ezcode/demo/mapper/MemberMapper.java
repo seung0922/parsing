@@ -8,9 +8,10 @@ import org.ezcode.demo.domain.MemberVO;
  */
 public interface MemberMapper {
 
-    public void insertMember(MemberVO vo);
-    public void insertAuth(AuthVO vo);
+    public int insertMember(MemberVO vo);
+
+    public int insertAuth(AuthVO vo);
+
     public MemberVO read(String userid);
-    
-    
+
 }

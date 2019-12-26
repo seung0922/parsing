@@ -33,7 +33,7 @@
   <insert id="insertMember">
 	insert into 
 	tbl_member 
-	(userid, userpw, username, email, tel, mlang) 
+	(userid, userpw, username, email, tel, mlang)
 	values 
 	(#{userid}, #{userpw}, #{username}, #{email}, #{tel}, #{mlang})
   </insert>

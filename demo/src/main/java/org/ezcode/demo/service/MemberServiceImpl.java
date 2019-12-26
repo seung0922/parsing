@@ -4,6 +4,7 @@ import org.ezcode.demo.domain.AuthVO;
 import org.ezcode.demo.domain.MemberVO;
 import org.ezcode.demo.mapper.MemberMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,12 +18,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MemberServiceImpl implements MemberService {
 
-    @Setter(onMethod_ = { @Autowired })
+    @Autowired
     private MemberMapper memberMapper;
+
+    @Autowired
+    private BCryptPasswordEncoder encoder;
 
     @Transactional
     @Override
-    public void join(MemberVO vo) {
+    public boolean join(MemberVO vo) {
 
         log.info("join service ------------------");
         
@@ -30,8 +34,12 @@ public class MemberServiceImpl implements MemberService {
         authVO.setUserid(vo.getUserid());
         authVO.setAuth("ROLE_MEMBER");
 
-        memberMapper.insertMember(vo);
-        memberMapper.insertAuth(authVO);
+        vo.setUserpw(encoder.encode(vo.getUserpw()));
+
+        int im = memberMapper.insertMember(vo);
+        int ia = memberMapper.insertAuth(authVO);
+
+        return (im + ia) == 2 ? true : false;
     }
 
 
