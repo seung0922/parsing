@@ -59,8 +59,13 @@ public class SearchController {
 		// 1. 키워드 없을 때
 		if(dto.getKeyword().equals("")) {
 
-			model.addAttribute("count", 0);
-			model.addAttribute("list", new ParseVO());
+			// model.addAttribute("count", 0);
+			// model.addAttribute("list", new ParseVO());
+
+			List<ParseVO> nullList = new ArrayList<>();
+
+			model.addAttribute("list", nullList);
+			model.addAttribute("pm", new PageMaker(0, dto));
 
 		} else { // 2. 키워드 있을 때
 
@@ -146,34 +151,34 @@ public class SearchController {
 			allKeyword = true;
 		}
 
-		final String[] keywords = keyword.split(",");
+		String[] keywords = keyword.split(",");
 
-		final File file = new File(path);
+		File file = new File(path);
 
-		final File[] fileList = file.listFiles();
+		File[] fileList = file.listFiles();
 
 		try {
-			for (final File f : fileList) {
+			for (File f : fileList) {
 				if (f.isFile()) { // 파일일때
 					/*
 					 * 예외처리
 					 */
 					try {
-						final FileReader fr = new FileReader(f.getCanonicalPath());
-						final BufferedReader br = new BufferedReader(fr);
+						FileReader fr = new FileReader(f.getCanonicalPath());
+						BufferedReader br = new BufferedReader(fr);
 
 						String line = "";
 
-						final String fpath = f.getPath();
+						String fpath = f.getPath();
 
 						// 확장자 얻어오기
-						final int langIdx = f.getName().lastIndexOf('.');
-						final String lang = f.getName().substring(langIdx + 1);
+						int langIdx = f.getName().lastIndexOf('.');
+						String lang = f.getName().substring(langIdx + 1);
 
 						// 파일 저장된 경로와 파일명 얻어오기
-						final int idx = fpath.lastIndexOf("\\");
-						final String fname = fpath.substring(idx + 1);
-						final String fnamePath = fpath.substring(0, idx);
+						int idx = fpath.lastIndexOf("\\");
+						String fname = fpath.substring(idx + 1);
+						String fnamePath = fpath.substring(0, idx);
 						
 						for(int l=0; l<searchLang.length; l++) {
 
@@ -190,7 +195,7 @@ public class SearchController {
 								boolean tenline = false; // 열줄만 출력하는 변수
 								boolean flag = false; // 한줄에 브레이스 짝이 맞을 때
 
-								final Stack<String> checkBrace = new Stack<String>(); // 브레이스 개수 체크
+								Stack<String> checkBrace = new Stack<String>(); // 브레이스 개수 체크
 
 								String code = "";
 
@@ -238,14 +243,16 @@ public class SearchController {
 
 													maxLine = 0;
 
+													// vo = ParseVO.builder().siteLink("github").comment(0).keyword(keywords[n]).path(fnamePath).fname(fname).start(i).build();
+
 													vo.setSiteLink("github");
 													vo.setComment(0);
 													vo.setKeyword(keywords[n]);
 													vo.setPath(fnamePath);
 													vo.setFname(fname);
+													vo.setStart(i);
 
 													isCode = true; // 코드 시작을 알려줌
-													vo.setStart(i);
 
 													k = i + 11; // 혹시나 열줄만 출력할거면 아래 10줄만 출력하기 위한 변수
 												}
@@ -268,6 +275,8 @@ public class SearchController {
 														code = "";
 
 														maxLine = 0;
+
+														//vo = ParseVO.builder().siteLink("github").comment(1).keyword(keywords[n]).path(fnamePath).fname(fname).start(i).build();
 
 														vo.setSiteLink("github");
 														vo.setComment(1);
@@ -307,6 +316,8 @@ public class SearchController {
 
 														maxLine = 0;
 
+														//vo = ParseVO.builder().siteLink("github").comment(1).keyword(keywords[n]).path(fnamePath).fname(fname).start(i).build();
+
 														vo.setSiteLink("github");
 														vo.setComment(1);
 														vo.setKeyword(keywords[n]);
@@ -325,15 +336,6 @@ public class SearchController {
 
 										} // 한줄 주석 끝
 										// -----------------------------------------------------------------------------------------------------------
-										// 브레이스 유무
-										// if (maxLine >= 30){
-
-										// vo.setCode(code);
-										// vo.setLang(lang);
-										// result.add(vo);
-										// maxLine = 0;
-										// continue;
-										// }
 
 										maxLine++;
 
@@ -347,6 +349,8 @@ public class SearchController {
 													isBrace = false;
 												}
 												if (i == k + 1 || maxLine >= 30) {
+													
+													//vo.builder().code(code).lang(lang).build();
 
 													vo.setCode(code);
 													vo.setLang(lang);
@@ -395,6 +399,8 @@ public class SearchController {
 													// 브레이스 체크 스택 비었으면 코드 출력안함
 													if ((checkBrace.empty() && blank) || maxLine >= 30) {
 
+														//vo.builder().code(code).lang(lang).build();
+
 														vo.setCode(code);
 														vo.setLang(lang);
 														result.add(vo);
@@ -414,6 +420,8 @@ public class SearchController {
 												code += line + "\r\n";
 
 												if (i == k + 1 || maxLine >= 30) {
+													
+													//vo.builder().code(code).lang(lang).build();
 
 													vo.setCode(code);
 													vo.setLang(lang);
@@ -442,7 +450,7 @@ public class SearchController {
 
 						br.close();
 
-					} catch (final Exception e) {
+					} catch (Exception e) {
 						// TODO: handle exception
 					}
 
@@ -453,7 +461,7 @@ public class SearchController {
 
 			}
 
-		} catch (final IOException e) {
+		} catch (IOException e) {
 
 		}
 
@@ -558,6 +566,7 @@ public class SearchController {
 
 			}
 			page += 1;
+
 		} while (page <= 5);
 
 		long end = System.currentTimeMillis() - start;
@@ -604,12 +613,14 @@ public class SearchController {
 			for (int i = 1; (line = br.readLine()) != null; i++) {
 
 				vo = new ParseVO();
+
+				//vo.builder().siteLink("google").comment(0).path(fname).fname(fname).lang(lang).build();
 				
 				vo.setSiteLink("google");
 				vo.setComment(0);
+				vo.setPath(url2);
 				vo.setFname(fname);
 				vo.setLang(lang);
-				vo.setPath(url2);
 				
 				if (!line.trim().startsWith("import ") && !line.trim().startsWith("public") && !line.trim().startsWith("package")) {
 
@@ -662,6 +673,8 @@ public class SearchController {
 						}
 						if (i == k + 1) {
 
+							//vo.builder().start(i).code(code).keyword(str).build();
+
 							vo.setStart(i);			
 							vo.setCode(code);
 							vo.setKeyword(str);
@@ -704,6 +717,8 @@ public class SearchController {
 							}
 
 							if (checkBrace.empty() && blank) {
+
+								//vo.builder().start(i).code(code).keyword(str).build();
 								
 								vo.setStart(i);			
 								vo.setCode(code);

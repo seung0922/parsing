@@ -65,3 +65,31 @@ h6{
 .rate{
 	margin-right:2px;
 }
+
+
+.cshop-page-div {
+	margin-top: 20px;
+	display: flex;
+	justify-content: center;
+}
+
+.orderAct {
+	font-weight: bold;
+
+}
+
+.search-option-span span {
+	font-weight: bold;
+	color: brown;
+	cursor: pointer;
+}
+
+.search-option-span {
+	background-color: #fff;
+	border: 1px solid gray;
+	border-radius: 5px;
+	padding: 5px;
+	display: inline-block;
+	margin-right: 5px;
+	margin-top: 10px;
+}

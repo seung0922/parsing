@@ -79,7 +79,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
             <button id="searchBtn" class="btn btn-primary search-btn" type="button">검색 <i class="fas fa-search" aria-hidden="true"></i></button>
 		  </div>
 		</div>
-        <small>'[[${pm.paging.keyword}]]' 검색결과가 [[${pm.total}]]건 있습니다.</small>
+        <small>'[[${pm.searchDTO.keyword}]]' 검색결과가 [[${pm.total}]]건 있습니다.</small>
 		</div>
 
 		<!-- 코드 검색결과 div -->
@@ -98,7 +98,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			</div>
 		</div>
 
-		<div class="page-div search-page-div">
+		<div th:if="${pm.total}!=0" class="page-div search-page-div">
 			<nav aria-label="Page navigation example">
 			  <ul class="pagination">
 			    <li th:if="${pm.prev}" class="page-item">
@@ -106,7 +106,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			        <span aria-hidden="true">&laquo;</span>
 			      </a>
 			    </li>
-				<li th:classappend="${pm.paging.page == num} ? active" 
+				<li th:classappend="${pm.searchDTO.page == num} ? active" 
 					th:each="num : ${#numbers.sequence(pm.start, pm.end)}" begin class="page-item">
 					<a class="page-link" th:href="${num}">[[${num}]]</a>
 				</li>
@@ -122,13 +122,13 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
 		<!-- 검색어, 조건들 넣는 히든태그 -->
 		<form id="sf" method="GET" action="/search/detail">
-			<input type="hidden" name="page" th:value="${pm.paging.page}">
-			<input type="hidden" name="amount" th:value="${pm.paging.amount}">
-			<input type="hidden" name="pno" th:value="${pm.paging.pno}">
-			<input type="hidden" name="keyword" th:value="${pm.paging.keyword}">
-			<input type="hidden" name="lang" th:value="${pm.paging.lang}">
-			<input type="hidden" name="siteLink" th:value="${pm.paging.siteLink}">
-			<input type="hidden" name="comment" th:value="${pm.paging.comment}">
+			<input type="hidden" name="page" th:value="${pm.searchDTO.page}">
+			<input type="hidden" name="amount" th:value="${pm.searchDTO.amount}">
+			<input type="hidden" name="pno" th:value="${pm.searchDTO.pno}">
+			<input type="hidden" name="keyword" th:value="${pm.searchDTO.keyword}">
+			<input type="hidden" name="lang" th:value="${pm.searchDTO.lang}">
+			<input type="hidden" name="siteLink" th:value="${pm.searchDTO.siteLink}">
+			<input type="hidden" name="comment" th:value="${pm.searchDTO.comment}">
 		</form>
 
     	</div>
