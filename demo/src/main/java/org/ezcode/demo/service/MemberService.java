@@ -11,5 +11,5 @@ public interface MemberService {
 
     public MemberVO read(String userid);
 
-    public MemberVO findByIdAndPw(String userid, String userpw);
+    public MemberVO findById(String userid);
 }

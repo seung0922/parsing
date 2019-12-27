@@ -46,6 +46,5 @@
 	  select *
 	  from tbl_member
 	  where userid = #{userid}
-	  and userpw = #{userpw}
   </select>
 </mapper>

@@ -10,62 +10,43 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	<br><br><br><br><br>
 <div class="container">
 	<div class="col-sm-6 well">
-		<h3>Join</h3>
-
-		<form method="post" th:action="@{/member/join}" th:object=${vo} id="f1">
+		<h3>MY INFO</h3>
+		<form method="post" th:action="@{/member/join}" id="f1">
 			<div class="form-group">
 				<label>id</label>
 				<input type="text" name="userid" class="form-control form-control-user"
-					id="exampleInputPassword" placeholder="">
-				<!-- <input type="text" name="userid" th:field="*{userid}" class="form-control form-control-user" />
-        		<p th:if="${#fields.hasErrors('userid')}" th:errors="*{userid}"></p> -->
+					id="userid" th:value="${memberInfo.userid}">
 			</div>
 			<div class="form-group">
 				<label>password</label>
 				<input type="password" name="userpw" class="form-control form-control-user"
-					id="userpw" placeholder="">
+					id="userpw" th:value="${memberInfo.userpw}">
 			</div>
             <div class="form-group">
 				<label>name</label>
 				<input type="text" name="username" class="form-control form-control-user"
-					id="username" placeholder="">
+					id="username" th:value="${memberInfo.username}">
 			</div>
             <div class="form-group">
 				<label>email</label>
 				<input type="text" name="email" class="form-control form-control-user"
-					id="exampleInputPassword" placeholder="">
-					<!-- <input type="text" name="email" th:field="*{email}" class="form-control form-control-user" />
-        		<p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p> -->
+					id="email" th:value="${memberInfo.email}">
 			</div>
             <div class="form-group">
 				<label>tel</label>
 				<input type="text" name="tel" class="form-control form-control-user"
-					id="exampleInputPassword" placeholder="">
+					id="tel" th:value="${memberInfo.tel}">
 
 			</div>
             <div class="form-group">
 				<label>main language</label>
 				<input type="text" name="mlang" class="form-control form-control-user"
-					id="exampleInputPassword" placeholder="">
-
+					id="mlang" th:value="${memberInfo.mlang}">
 			</div>
-			<!-- <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> -->
 			<br>
-			<button class="btn btn-primary btn-success" type="submit">가입</button>
-			<button class="btn btn-outline-primary btn-join" type="button">취소</button>
 		</form>
 		<hr>
 	</div>
 </div>
-
-<script>
-
-    $(".btn-success").on("click", function (e) {
-
-        e.preventDefault();
-        $("#f1").submit();
-    });
-
-</script>
 
 </div>

@@ -51,12 +51,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberVO findByIdAndPw(String userid, String userpw) {
-
-        return memberMapper.selectOneMember(userid, userpw);
+    public MemberVO findById(String userid) {
+        return memberMapper.selectOneMember(userid);
     }
-
-
-    
 
 }
