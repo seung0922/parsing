@@ -107,15 +107,15 @@ public class OAuth2Controller {
         return "loginSuccess";
     }
 
-    @GetMapping("/join")
-    public void joinGET() {
+    // @GetMapping("/join")
+    // public void joinGET() {
 
-    }
+    // }
 
-    @PostMapping("/join")
-    public String joinPOST(MemberVO vo) {
-        log.info("join post controller -----------------------------" + vo);
-        memberService.join(vo);
-        return "redirect:/oauth_login";
-    }
+    // @PostMapping("/join")
+    // public String joinPOST(MemberVO vo) {
+    //     log.info("join post controller -----------------------------" + vo);
+    //     memberService.join(vo);
+    //     return "redirect:/oauth_login";
+    // }
 }

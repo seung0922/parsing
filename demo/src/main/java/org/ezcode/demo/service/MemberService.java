@@ -9,4 +9,7 @@ public interface MemberService {
 
     public boolean join(MemberVO vo);
 
+    public MemberVO read(String userid);
+
+    public MemberVO findByIdAndPw(String userid, String userpw);
 }

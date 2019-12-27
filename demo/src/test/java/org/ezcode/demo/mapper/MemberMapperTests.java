@@ -31,7 +31,12 @@ public class MemberMapperTests {
 
         log.info("" + mapper.insertMember(vo));
 
-        
-
     }
+
+    @Test
+    public void selectOneMemTest() {
+
+        log.info("" + mapper.selectOneMember("dltdlt", "1234"));
+    }
+
 }

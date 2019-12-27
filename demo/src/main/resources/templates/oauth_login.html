@@ -40,19 +40,19 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 	<div class="limiter">
 		<div class="container-login100">
 			<div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-54">
-				<form class="login100-form validate-form">
+
+				<form role="form" class="login100-form validate-form" method="post" th:action="@{/login}">
 					<span class="login100-form-title p-b-49">
 						Login
 					</span>
 					<div class="wrap-input100 validate-input m-b-23" data-validate = "Username is reauired">
 						<span class="label-input100">Username</span>
 						<span class="fas fa-lock iput"><input type="text" style="height: 25px" class="iput"  name="username" placeholder="Type your username"></span>
-						
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate="Password is required">
 						<span class="label-input100">Password</span>
-						<span class="fas fa-key iput"><input style="height: 25px" class="iput" type="password" name="pass" placeholder="Type your password"></span>
+						<span class="fas fa-key iput"><input style="height: 25px" class="iput" type="password" name="password" placeholder="Type your password"></span>
 						
 					</div>
 					<div class="signupDiv" style="width: 100%">
@@ -65,7 +65,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 					<div class="container-login100-form-btn">
 						<div class="wrap-login100-form-btn">
 							<div class="login100-form-bgbtn"></div>
-							<button class="login100-form-btn">
+							<button class="login100-form-btn loginBtn" type="submit">
 								Login
 							</button>
 						</div>
@@ -101,14 +101,24 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 						</a>
 					</div>
 					</div>
-
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 				</form>
+
 			</div>
 		</div>
 	</div>
 	
 
 	<div id="dropDownSelect1"></div>
+
+	<script>
+		$(".loginBtn").on("click", function(e) {
+
+			e.preventDefault();
+			$("form").submit();
+
+		});
+	</script>
 
 	<script src='https://kit.fontawesome.com/a076d05399.js'></script>
 	<script th:src="@{/login/vendor/jquery/jquery-3.2.1.min.js}"></script>

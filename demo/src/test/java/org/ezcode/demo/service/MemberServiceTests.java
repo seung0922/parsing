@@ -24,17 +24,22 @@ public class MemberServiceTests {
     @Test
     public void testInertMember() {
 
-        MemberVO vo = new MemberVO();
-        vo.setUserid("gogo1");
-        vo.setUserpw(encoder.encode("gogo1"));
-        vo.setUsername("회원");
-        vo.setEmail("email");
-        vo.setTel("tel");
-        vo.setMlang("java");
-        // AuthVO authVO = new AuthVO();
-        // authVO.setUserid("gogo");
-        // auth.setAuth("ROLE_MEMBER");
+        // MemberVO vo = new MemberVO();
+        // vo.setUserid("gogo1");
+        // vo.setUserpw(encoder.encode("gogo1"));
+        // vo.setUsername("회원");
+        // vo.setEmail("email");
+        // vo.setTel("tel");
+        // vo.setMlang("java");
+        // // AuthVO authVO = new AuthVO();
+        // // authVO.setUserid("gogo");
+        // // auth.setAuth("ROLE_MEMBER");
 
-        memberService.join(vo);
+        // memberService.join(vo);
+
+        boolean a = encoder.matches("4", "$2a$10$iVy.UgUeSVO00f0BiN8XweqVjkAgSYmirob8EFXJuyPLzOoyOWcqG");
+
+        log.info("" + a);
+
     }
 }

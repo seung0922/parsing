@@ -14,4 +14,6 @@ public interface MemberMapper {
 
     public MemberVO read(String userid);
 
+    public MemberVO selectOneMember(String userid, String userpw);
+
 }

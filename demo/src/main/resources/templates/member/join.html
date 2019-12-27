@@ -10,11 +10,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	<br><br><br><br><br>
 <div class="container">
 	<div class="col-sm-6 well">
-		<div sec:authorize="isAuthenticated()">
-			Name: <span sec:authentication="principal.attributes">SomeName</span><br />
-		</div>
 		<h3>Join</h3>
-		<form method="post" action="/member/join" th:action="@{/join}">
+		<form method="post" th:action="@{/member/join}" id="f1">
 			<div class="form-group">
 				<label>id</label>
 				<input type="text" class="form-control form-control-user" name="userid" value="">
@@ -46,8 +43,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			</div>
 			<!-- <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> -->
 			<br>
-			<button class="btn btn-primary  btn-success" type="submit">가입</button>
-			<button class="btn btn-outline-primary  btn-join" type="button">취소</button>
+			<button class="btn btn-primary btn-success" type="submit">가입</button>
+			<button class="btn btn-outline-primary btn-join" type="button">취소</button>
 		</form>
 		<hr>
 	
@@ -59,7 +56,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     $(".btn-success").on("click", function (e) {
 
         e.preventDefault();
-        $("form").submit();
+        $("#f1").submit();
+
     });
 
 </script>

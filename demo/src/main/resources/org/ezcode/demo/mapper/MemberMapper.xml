@@ -41,4 +41,11 @@
   <insert id="insertAuth">
     insert into tbl_member_auth (userid, auth) values(#{userid},#{auth})
   </insert>
+
+  <select id="selectOneMember" resultType="org.ezcode.demo.domain.MemberVO">
+	  select *
+	  from tbl_member
+	  where userid = #{userid}
+	  and userpw = #{userpw}
+  </select>
 </mapper>

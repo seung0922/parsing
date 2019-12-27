@@ -27,7 +27,12 @@ public class MemberController {
     @GetMapping("/login")
 	public void loginPage() {
 		log.info("login...........................");
-	}
+    }
+    
+    @PostMapping("/login")
+    public void loginPOST() {
+
+    }
 
 	@GetMapping("/join")
 	public void joinGET() {
@@ -38,11 +43,14 @@ public class MemberController {
     public String joinPOST(MemberVO vo) {
         
         log.info("join post......................");
+
+        log.info("" + vo);
         
         log.info("" + memberService.join(vo));
 
         return "redirect:/oauth_login";
     }
+
 
 //----------------------------------------------------------------------------
     @GetMapping("/all")

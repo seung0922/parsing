@@ -8,7 +8,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -23,6 +22,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     private BCryptPasswordEncoder encoder;
+
+    // @Setter(onMethod_ = {@Autowired})
+    // private PasswordEncoder encoder;
 
     @Transactional
     @Override
@@ -40,6 +42,18 @@ public class MemberServiceImpl implements MemberService {
         int ia = memberMapper.insertAuth(authVO);
 
         return (im + ia) == 2 ? true : false;
+    }
+
+    @Override
+    public MemberVO read(String userid) {
+
+        return memberMapper.read(userid);
+    }
+
+    @Override
+    public MemberVO findByIdAndPw(String userid, String userpw) {
+
+        return memberMapper.selectOneMember(userid, userpw);
     }
 
 

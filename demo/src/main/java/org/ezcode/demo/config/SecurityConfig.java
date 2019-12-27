@@ -3,9 +3,9 @@ package org.ezcode.demo.config;
 import javax.sql.DataSource;
 
 import org.ezcode.demo.mapper.MemberMapper;
+import org.ezcode.demo.security.CustomLoginSuccessHandler;
 import org.ezcode.demo.security.CustomOAuth2UserService;
 import org.ezcode.demo.security.CustomUserDetailsService;
-import org.ezcode.demo.security.OAuth2AuthenticationFailureHandler;
 import org.ezcode.demo.security.OAuthLoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +23,7 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCo
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
@@ -45,17 +46,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private MemberMapper memberMapper;
 
-    @Autowired
-    private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-
     // @Setter(onMethod_ = {@Autowired})
-    // private CustomOAuth2UserService customOAuth2UserServiceq;
+    // private CustomOAuth2UserService customOAuth2UserService;
 
     @Override
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
 
         auth.userDetailsService(customUserService())
         .passwordEncoder(passwordEncoder());
+
+        log.info("configure..................................");
+
     }
 
     @Bean
@@ -115,6 +116,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+    public AuthenticationSuccessHandler loginSuccessHandler() {
+        return new CustomLoginSuccessHandler();
+    }
+
+    @Bean
     public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
         return new HttpSessionOAuth2AuthorizationRequestRepository();
     }
@@ -144,28 +150,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        return bCryptPasswordEncoder;
+        return new BCryptPasswordEncoder();
     }
-
-    // @Bean
-    // public PrincipalExtractor principalExtractor() {
-    //     return map -> {
-    //         String principalId = (String) map.get("id");
-    //         MemberVO vo = memberMapper.read(principalId);
-    //         if (vo == null) {
-    //             log.info("No user found, generating profile for {}", principalId);
-    //             vo = new MemberVO();
-
-    //             vo.setUserid((String) map.get("name"));
-    //             vo.setUsername((String) map.get("name"));
-    //             vo.setEmail((String) map.get("name"));
-                
-
-    //         } 
-            
-    //         return vo;
-    //     };
-    // }
-    
 }
