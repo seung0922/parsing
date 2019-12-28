@@ -47,4 +47,21 @@
 	  from tbl_member
 	  where userid = #{userid}
   </select>
+
+  <update id="updateMember">
+	update tbl_member
+	set userpw = #{userpw}, email = #{email}, tel = #{tel}, mlang = #{mlang}
+	where userid = #{userid}
+  </update>
+
+  <delete id="deleteMember">
+	delete from tbl_member
+	where userid = #{userid}
+  </delete>
+
+  <delete id="deleteMemberAuth">
+	delete from tbl_member_auth
+	where userid = #{userid}
+  </delete>
+
 </mapper>

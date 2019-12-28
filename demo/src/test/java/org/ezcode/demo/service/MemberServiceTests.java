@@ -22,6 +22,14 @@ public class MemberServiceTests {
     private BCryptPasswordEncoder encoder;
 
     @Test
+    public void modifyPwTest() {
+
+        MemberVO vo = memberService.findById("9");
+
+        
+    }
+
+    @Test
     public void testInertMember() {
 
         // MemberVO vo = new MemberVO();

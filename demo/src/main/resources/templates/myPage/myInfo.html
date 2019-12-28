@@ -10,12 +10,20 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	<br><br><br><br><br>
 <div class="container">
 	<div class="col-sm-6 well">
+		
 		<h3>MY INFO</h3>
-		<form method="post" th:action="@{/member/join}" id="f1">
+		<hr>
+		<form method="post" th:action="@{/myPage/quit}">
+			<input type="hidden" name="userid" class="form-control form-control-user"
+					id="userid" th:value="${memberInfo.userid}">
+			<button class="btn btn-primary btn-success" type="submit">회원탈퇴</button>
+		</form>
+		
+		<form method="post" th:action="@{/myPage/myInfo}" id="f1">
 			<div class="form-group">
 				<label>id</label>
 				<input type="text" name="userid" class="form-control form-control-user"
-					id="userid" th:value="${memberInfo.userid}">
+					id="userid" th:value="${memberInfo.userid}" readonly>
 			</div>
 			<div class="form-group">
 				<label>password</label>
@@ -25,7 +33,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
             <div class="form-group">
 				<label>name</label>
 				<input type="text" name="username" class="form-control form-control-user"
-					id="username" th:value="${memberInfo.username}">
+					id="username" th:value="${memberInfo.username}" readonly>
 			</div>
             <div class="form-group">
 				<label>email</label>
@@ -44,6 +52,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 					id="mlang" th:value="${memberInfo.mlang}">
 			</div>
 			<br>
+			<button class="btn btn-primary btn-success" type="submit">수정</button>
+			<button class="btn btn-outline-primary btn-join" type="button">취소</button>
 		</form>
 		<hr>
 	</div>

@@ -12,6 +12,10 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class DemoApplication {
 
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+    
 	@Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
@@ -26,9 +30,5 @@ public class DemoApplication {
         bean.setValidationMessageSource(messageSource());
         return bean;
     }
-
-	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
-	}
 
 }

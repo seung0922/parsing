@@ -33,6 +33,7 @@ public class MemberServiceImpl implements MemberService {
         log.info("join service ------------------");
         
         AuthVO authVO = new AuthVO();
+
         authVO.setUserid(vo.getUserid());
         authVO.setAuth("ROLE_MEMBER");
 
@@ -53,6 +54,24 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberVO findById(String userid) {
         return memberMapper.selectOneMember(userid);
+    }
+
+    @Override
+    public boolean ModifyMember(MemberVO vo) {
+
+        vo.setUserpw(encoder.encode(vo.getUserpw()));
+
+        return memberMapper.updateMember(vo) == 1 ? true : false;
+    }
+
+    @Transactional
+    @Override
+    public boolean quitMember(String userid) {
+
+        int dma = memberMapper.deleteMemberAuth(userid);
+        int dm = memberMapper.deleteMember(userid);
+
+        return (dma + dm) == 2 ? true : false;
     }
 
 }

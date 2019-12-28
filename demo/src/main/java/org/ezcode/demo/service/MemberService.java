@@ -12,4 +12,9 @@ public interface MemberService {
     public MemberVO read(String userid);
 
     public MemberVO findById(String userid);
+
+    public boolean ModifyMember(MemberVO vo);
+
+    public boolean quitMember(String userid);
+
 }
