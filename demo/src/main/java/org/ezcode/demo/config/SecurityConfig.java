@@ -83,7 +83,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .deleteCookies("remember-me", "JSESSIONID");
 
         http.rememberMe()
-	      .key("ezcode")
+          .key("ezcode")
 	      .tokenRepository(persistentTokenRepository())
           .tokenValiditySeconds(604800);
         

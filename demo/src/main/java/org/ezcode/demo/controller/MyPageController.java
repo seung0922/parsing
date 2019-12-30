@@ -6,7 +6,6 @@ import javax.servlet.http.HttpSession;
 
 import org.ezcode.demo.domain.MemberVO;
 import org.ezcode.demo.security.CustomOAuth2User;
-import org.ezcode.demo.security.domain.CustomUser;
 import org.ezcode.demo.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
