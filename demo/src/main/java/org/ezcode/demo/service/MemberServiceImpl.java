@@ -53,15 +53,35 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberVO findById(String userid) {
-        return memberMapper.selectOneMember(userid);
+        
+        return memberMapper.selectOneMemberById(userid);
+    }
+
+    @Override
+    public boolean checkByIdAndPw(String userid, String userpw) {
+
+        MemberVO getMem = memberMapper.selectOneMemberById(userid);
+
+        log.info("get member by id........." + getMem);
+
+        return encoder.matches(userpw, getMem.getUserpw());
     }
 
     @Override
     public boolean ModifyMember(MemberVO vo) {
 
+        return memberMapper.updateMember(vo) == 1 ? true : false;
+    }
+
+    @Override
+    public boolean ModifyPw(MemberVO vo) {
+
+        log.info("modify password......................");
+        log.info("" + vo);
+
         vo.setUserpw(encoder.encode(vo.getUserpw()));
 
-        return memberMapper.updateMember(vo) == 1 ? true : false;
+        return memberMapper.updatePw(vo) == 1 ? true : false;
     }
 
     @Transactional
@@ -73,5 +93,6 @@ public class MemberServiceImpl implements MemberService {
 
         return (dma + dm) == 2 ? true : false;
     }
+
 
 }

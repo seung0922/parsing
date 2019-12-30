@@ -1,62 +1,81 @@
 <!DOCTYPE html>
-<html 
-xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorate="~{layout/basicLayout}">
-<link rel="stylesheet"
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
-</head>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/mypageLayout}">
 
-<div class="site-section" id="properties-section"  layout:fragment="content">
-	<br><br><br><br><br>
-<div class="container">
-	<div class="col-sm-6 well">
+<div class="container" th:replace="fragments/mypageLayout :: mypage-container">
+	<div class="mypage-content" layout:fragment="mypage-content">
+		<!-- css 링크 -->
+		<!-- <link rel="stylesheet" th:href="@{/css/css.css}"> -->
+
+		<!-- Bootstrap -->
+        <link th:href="@{/resources/bootstrap/css/bootstrap.css}" rel="stylesheet" type="text/css"/>
+        <link th:href="@{/resources/image/icon/HalfLife.ico}" rel="shortcuticon">
 		
-		<h3>MY INFO</h3>
-		<hr>
-		<form method="post" th:action="@{/myPage/quit}">
-			<input type="hidden" name="userid" class="form-control form-control-user"
-					id="userid" th:value="${memberInfo.userid}">
-			<button class="btn btn-primary btn-success" type="submit">회원탈퇴</button>
-		</form>
-		
-		<form method="post" th:action="@{/myPage/myInfo}" id="f1">
-			<div class="form-group">
-				<label>id</label>
-				<input type="text" name="userid" class="form-control form-control-user"
-					id="userid" th:value="${memberInfo.userid}" readonly>
-			</div>
-			<div class="form-group">
-				<label>password</label>
-				<input type="password" name="userpw" class="form-control form-control-user"
-					id="userpw" th:value="${memberInfo.userpw}">
-			</div>
-            <div class="form-group">
-				<label>name</label>
-				<input type="text" name="username" class="form-control form-control-user"
-					id="username" th:value="${memberInfo.username}" readonly>
-			</div>
-            <div class="form-group">
-				<label>email</label>
-				<input type="text" name="email" class="form-control form-control-user"
-					id="email" th:value="${memberInfo.email}">
-			</div>
-            <div class="form-group">
-				<label>tel</label>
-				<input type="text" name="tel" class="form-control form-control-user"
-					id="tel" th:value="${memberInfo.tel}">
+		<!-- 메뉴명 & 설명 -->
+		<h4>정보수정</h4>
+		<p>정보</p>
 
-			</div>
-            <div class="form-group">
-				<label>main language</label>
-				<input type="text" name="mlang" class="form-control form-control-user"
-					id="mlang" th:value="${memberInfo.mlang}">
-			</div>
-			<br>
-			<button class="btn btn-primary btn-success" type="submit">수정</button>
-			<button class="btn btn-outline-primary btn-join" type="button">취소</button>
-		</form>
-		<hr>
-	</div>
-</div>
+		<!-- 본문 -->
+		<div>
+			<form class="form-horizontal" method="post" th:action="@{/mypage/myinfo}" id="f1">
+				<div class="form-group" id="divId">
+					<label for="inputId" class="col-lg-2 control-label">아이디</label>
+					<div class="col-lg-10">
+						<input type="text" name="userid" class="form-control form-control-user"
+						id="userid" th:value="${memberInfo.userid}" readonly>
+					</div>
+				</div>
+				<div class="form-group" id="divName">
+					<label for="inputName" class="col-lg-2 control-label">이름</label>
+					<div class="col-lg-10">
+						<input type="text" name="username" class="form-control form-control-user"
+						id="username" th:value="${memberInfo.username}">
+					</div>
+				</div>
+				<div class="form-group" id="divEmail">
+					<label for="inputEmail" class="col-lg-2 control-label">이메일</label>
+					<div class="col-lg-10">
+						<input type="text" name="email" class="form-control form-control-user"
+						id="email" th:value="${memberInfo.email}">
+					</div>
+				</div>
+				<div class="form-group" id="divPhoneNumber">
+					<label for="inputPhoneNumber" class="col-lg-2 control-label">휴대폰 번호</label>
+					<div class="col-lg-10">
+						<input type="text" name="tel" class="form-control form-control-user"
+						id="tel" th:value="${memberInfo.tel}">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="inputPhoneNumber" class="col-lg-2 control-label">주 언어</label>
+					<div class="col-lg-10">
+						<input type="text" name="mlang" class="form-control form-control-user"
+						id="mlang" th:value="${memberInfo.mlang}">
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-lg-offset-2 col-lg-10">
+						<button class="btn btn-primary btn-success" type="submit">수정</button>
+					</div>
+				</div>
+			</form>
+		</div>
 
-</div>
+
+	<!-- script -->
+	<script>
+		$(document).ready(function() {
+			$(".btn-success").on("click", function(e) {
+				
+				e.preventDefault();
+
+				swal("정보가 수정되었습니다.", {
+					icon: "success",
+				})
+				.then(function() {
+					$("#f1").submit();
+				});
+			});
+		});
+	</script>	 
+	</div>	<!-- (mypage-content) fragment close -->
+</div>	<!-- (mypage-container) div close -->

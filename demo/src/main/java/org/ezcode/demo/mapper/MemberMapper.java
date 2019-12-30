@@ -14,11 +14,16 @@ public interface MemberMapper {
 
     public MemberVO read(String userid);
 
-    public MemberVO selectOneMember(String userid);
+    public MemberVO selectOneMemberById(String userid);
+
+    // public MemberVO selectOneMemberByIdAndPw(String userid, String userpw);
 
     public int updateMember(MemberVO vo);
+
+    public int updatePw(MemberVO vo);
 
     public int deleteMember(String userid);
 
     public int deleteMemberAuth(String userid);
+
 }

@@ -42,15 +42,28 @@
     insert into tbl_member_auth (userid, auth) values(#{userid},#{auth})
   </insert>
 
-  <select id="selectOneMember" resultType="org.ezcode.demo.domain.MemberVO">
+  <select id="selectOneMemberById" resultType="org.ezcode.demo.domain.MemberVO">
 	  select *
 	  from tbl_member
 	  where userid = #{userid}
   </select>
 
+  <!-- <select id="selectOneMemberByIdAndPw" resultType="org.ezcode.demo.domain.MemberVO">
+	select *
+	from tbl_member
+	where userid = #{userid}
+	and userpw = #{userpw}
+  </select> -->
+
   <update id="updateMember">
 	update tbl_member
-	set userpw = #{userpw}, email = #{email}, tel = #{tel}, mlang = #{mlang}
+	set username = #{username}, email = #{email}, tel = #{tel}, mlang = #{mlang}
+	where userid = #{userid}
+  </update>
+
+  <update id="updatePw">
+	update tbl_member
+	set userpw = #{userpw}
 	where userid = #{userid}
   </update>
 

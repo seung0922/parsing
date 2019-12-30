@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/mypageLayout}">
+
+<div class="container" th:replace="fragments/mypageLayout :: mypage-container">
+	<div class="mypage-content" layout:fragment="mypage-content">
+		<!-- css 링크 -->
+        <!-- <link rel="stylesheet" th:href="@{/css/css.css}"> -->
+
+		<!-- 메뉴명 & 설명 -->
+		<h4>회원탈퇴</h4>
+		<p>정보</p>
+
+		<!-- 본문 -->
+		<div>
+			<form class="form-horizontal" method="post" th:action="@{/mypage/quit}" id="f1">
+                <input type="hidden" name="userid" class="form-control form-control-user" th:value="${memberInfo.userid}">
+
+                <div class="form-group">
+					<div class="col-lg-offset-2 col-lg-10">
+						<button class="btn btn-primary btn-success" type="submit">회원 탈퇴</button>
+					</div>
+				</div>
+            </form>
+
+		</div>
+
+	<!-- script -->
+	<script>
+
+		$(document).ready(function() {
+
+            $(".btn-success").on("click", function(e) {
+
+                e.preventDefault();
+
+                swal({
+                    title: "정말 탈퇴하시겠습니까?",
+                    text: "탈퇴하시면 모든 정보를 잃게 됩니다.... 가지마세요",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        swal("응 꺼져", {
+                            icon: "success",
+                        })
+                        .then(function() {
+                            $("#f1").submit();
+                        });
+                    } else {
+                        swal("굿 쵸이스-☆★");
+                    }
+                });
+            });
+        });
+    </script>	 
+    
+	</div>	<!-- (mypage-content) fragment close -->
+</div>	<!-- (mypage-container) div close -->

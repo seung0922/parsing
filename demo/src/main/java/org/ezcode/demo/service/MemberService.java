@@ -13,7 +13,11 @@ public interface MemberService {
 
     public MemberVO findById(String userid);
 
+    public boolean checkByIdAndPw(String userid, String userpw);
+
     public boolean ModifyMember(MemberVO vo);
+
+    public boolean ModifyPw(MemberVO vo);
 
     public boolean quitMember(String userid);
 

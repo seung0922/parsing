@@ -24,7 +24,7 @@ public class MemberMapperTests {
     @Test
     public void updatepw() {
 
-        MemberVO vo = mapper.selectOneMember("7");
+        MemberVO vo = mapper.selectOneMemberById("7");
 
         log.info("" + encoder.matches("7", vo.getUserpw()));
 
