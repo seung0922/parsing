@@ -2,6 +2,9 @@ package org.ezcode.demo.controller;
 
 import java.security.Principal;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.ezcode.demo.domain.MemberVO;
@@ -30,25 +33,20 @@ public class MyPageController {
 
 	@GetMapping("/mypage")
 	public void myPage() {
-		
+
 		log.info("MyPage....");
 
 	}
 
-	// @GetMapping("/mypage-sample")
-    // public String sample() {
-    //     return "/mypage/mypage-sample";
-    // }
-
-	@GetMapping({"/myinfo", "/mypw", "/quit"})
-	public void myInfoGET(Principal principal, @AuthenticationPrincipal CustomOAuth2User customUser, Model model) { 
+	@GetMapping({ "/myinfo", "/mypw", "/quit" })
+	public void myInfoGET(Principal principal, @AuthenticationPrincipal CustomOAuth2User customUser, Model model) {
 
 		// 소셜으로 로그인했는지, 그냥 회원으로 로그인했는지 구별해줘야 함
 		String username = "";
 
-		if(customUser != null) { // 소셜 로그인
+		if (customUser != null) { // 소셜 로그인
 
-			log.info("sns login!");	
+			log.info("sns login!");
 
 			username = customUser.getMember().getUserid();
 
@@ -56,12 +54,12 @@ public class MyPageController {
 
 			username = principal.getName();
 		}
-		
+
 		log.info("username............." + username);
 
 		log.info("" + service.findById(username));
 
-		if(service.findById(username) != null) {
+		if (service.findById(username) != null) {
 			model.addAttribute("memberInfo", service.findById(username));
 		}
 
@@ -78,44 +76,42 @@ public class MyPageController {
 		return "redirect:/mypage/myinfo";
 	}
 
-	// @GetMapping("/mypw")
-    // public void mypwGET() {
-        
-    //     log.info("my pw modify get.................");
-	// }
-	
 	@PostMapping("/mypw")
-    public String mypwPOST(MemberVO vo) {
-        
+	public String mypwPOST(MemberVO vo) {
+
 		log.info("my pw modify post.................");
-		
+
 		service.ModifyPw(vo);
 
 		return "redirect:/mypage/mypw";
-    }
+	}
 
 	@PostMapping("/quit")
-	public String quitMember(String userid, HttpSession session) {
+	public ResponseEntity<String> checkPwPOST(String userid) {
 
-		// db에서 해당 멤버 삭제
-		service.quitMember(userid);
+		log.info(userid);
 
-		// 세션 삭제
-		session.invalidate();
+		boolean result = service.quitMember(userid);
 
-		return "redirect:/";
+		log.info("" + result);
+
+		return result ? new ResponseEntity<>("success", HttpStatus.OK)
+				: new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@PostMapping("/checkpw")
-	public ResponseEntity<String> checkPwPOST(@RequestBody MemberVO vo) {
+	public ResponseEntity<String> checkPwPOST(String userid, String userpw) {
 
-		log.info("" + vo);
+		log.info(userid);
+		log.info(userpw);
 
 		// id와 비밀번호를 받아서 db에 있는 정보와 일치하는지 확인한다.
-		boolean result = service.checkByIdAndPw(vo.getUserid(), vo.getUserpw());
+		boolean result = service.checkByIdAndPw(userid, userpw);
 
-		return result == true ? new ResponseEntity<>("success", HttpStatus.OK) :
-			new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		log.info("" + result);
+
+		return result ? new ResponseEntity<>("success", HttpStatus.OK)
+				: new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }

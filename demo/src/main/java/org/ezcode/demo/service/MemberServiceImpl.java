@@ -23,9 +23,6 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private BCryptPasswordEncoder encoder;
 
-    // @Setter(onMethod_ = {@Autowired})
-    // private PasswordEncoder encoder;
-
     @Transactional
     @Override
     public boolean join(MemberVO vo) {
@@ -88,8 +85,13 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean quitMember(String userid) {
 
+        log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        log.info(userid);
+
         int dma = memberMapper.deleteMemberAuth(userid);
+        log.info("" + dma);
         int dm = memberMapper.deleteMember(userid);
+        log.info("" + dm);
 
         return (dma + dm) == 2 ? true : false;
     }
