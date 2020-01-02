@@ -48,7 +48,7 @@ public class MemberController {
     }
     
     @PostMapping("/join")
-    public String joinPOST(@Valid @ModelAttribute("vo") MemberVO vo, BindingResult bindingResult, Model model) {
+    public String joinPOST(@Valid @ModelAttribute("vo") MemberVO vo, BindingResult bindingResult) {
         
         if (bindingResult.hasErrors()) {
 

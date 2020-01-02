@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/mypageLayout}">
+
+<div class="container" th:replace="fragments/mypageLayout :: mypage-container">
+	<div class="mypage-content" layout:fragment="mypage-content">
+		<!-- css 링크 -->
+		<!-- <link rel="stylesheet" th:href="@{/css/css.css}"> -->
+
+		<!-- Bootstrap -->
+        <link th:href="@{/resources/bootstrap/css/bootstrap.css}" rel="stylesheet" type="text/css"/>
+        <link th:href="@{/resources/image/icon/HalfLife.ico}" rel="shortcuticon">
+		
+        <!-- 메뉴명 & 설명 -->
+        <div>
+            <h4>친구 관리</h4>
+            <!-- <p>내 친구 목록</p> -->
+        </div>
+
+        <hr>
+		<!-- 본문 -->
+        <div>
+            <div>
+                <p><b>친구요청 목록</b></p>
+                <ul th:each="request : ${requestList}">
+                    <li th:text="${request}"></li>
+                </ul>
+
+                <p><b>친구 목록</b></p>
+                <ul th:each="friend : ${friendList}">
+                    <li th:text="${friend.receiver}"></li>
+                </ul>
+            </div>
+
+        </div>
+
+	<!-- script -->
+	<script>
+
+	</script>	 
+	</div>	<!-- (mypage-content) fragment close -->
+</div>	<!-- (mypage-container) div close -->

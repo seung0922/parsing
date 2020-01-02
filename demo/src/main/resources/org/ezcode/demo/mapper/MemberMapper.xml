@@ -30,6 +30,28 @@
 		WHERE mem.userid = #{userid}
 	</select>
 
+	<!-- 친구 목록 -->
+	<select id="selectFriends" resultType="org.ezcode.demo.domain.FriendVO">
+		(select receiver
+		from tbl_friend
+		where sender = #{userid}
+		and friendcheck = 1)
+		union all
+		(select sender
+		from tbl_friend
+		where receiver = #{userid}
+		and friendcheck = 1)
+	</select>
+
+	<!-- 친구 요청 목록 -->
+	<select id="selectRequestFriends" resultType="org.ezcode.demo.domain.FriendVO">
+		select *
+		from tbl_friend
+		where (sender = #{userid}
+		or receiver = #{userid})
+		and friendcheck = 0
+	</select>
+
   <insert id="insertMember">
 	insert into 
 	tbl_member 

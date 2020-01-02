@@ -1,5 +1,9 @@
 package org.ezcode.demo.mapper;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.ezcode.demo.domain.FriendVO;
 import org.ezcode.demo.domain.MemberVO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +24,21 @@ public class MemberMapperTests {
 
     @Autowired
     private BCryptPasswordEncoder encoder;
+
+    @Test
+    public void selectFriends() {
+
+        String userid = "123123";
+
+        List<FriendVO> voList = new ArrayList<>();
+
+        voList = mapper.selectFriends(userid);
+
+        voList.forEach(vo -> {
+            log.info("" + vo);
+        });
+        
+    }
 
     @Test
     public void updatepw() {

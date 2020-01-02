@@ -1,6 +1,9 @@
 package org.ezcode.demo.service;
 
+import java.util.List;
+
 import org.ezcode.demo.domain.AuthVO;
+import org.ezcode.demo.domain.FriendVO;
 import org.ezcode.demo.domain.MemberVO;
 import org.ezcode.demo.mapper.MemberMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +31,7 @@ public class MemberServiceImpl implements MemberService {
     public boolean join(MemberVO vo) {
 
         log.info("join service ------------------");
-        
+
         AuthVO authVO = new AuthVO();
 
         authVO.setUserid(vo.getUserid());
@@ -50,7 +53,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberVO findById(String userid) {
-        
+
         return memberMapper.selectOneMemberById(userid);
     }
 
@@ -94,6 +97,22 @@ public class MemberServiceImpl implements MemberService {
         log.info("" + dm);
 
         return (dma + dm) == 2 ? true : false;
+    }
+
+    @Override
+    public List<FriendVO> findFriends(String userid) {
+
+        log.info("find friends..........................");
+
+        return memberMapper.selectFriends(userid);
+    }
+
+    @Override
+    public List<FriendVO> findRequestFriends(String userid) {
+
+        log.info("find request friends...........................");
+
+        return memberMapper.selectRequestFriends(userid);
     }
 
 

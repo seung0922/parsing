@@ -2,11 +2,6 @@ package org.ezcode.demo.controller;
 
 import java.security.Principal;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.ezcode.demo.domain.MemberVO;
 import org.ezcode.demo.security.CustomOAuth2User;
 import org.ezcode.demo.service.MemberService;
@@ -18,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +56,6 @@ public class MyPageController {
 		if (service.findById(username) != null) {
 			model.addAttribute("memberInfo", service.findById(username));
 		}
-
 	}
 
 	@PostMapping("/myinfo")
@@ -85,6 +78,35 @@ public class MyPageController {
 
 		return "redirect:/mypage/mypw";
 	}
+
+	@GetMapping("/mypartner")
+	public void mypartnerGET(Principal principal, @AuthenticationPrincipal CustomOAuth2User customUser, Model model) {
+
+		log.info("my partner page get....................");
+
+		// 소셜으로 로그인했는지, 그냥 회원으로 로그인했는지 구별해줘야 함
+		String username = "";
+
+		if (customUser != null) { // 소셜 로그인
+
+			log.info("sns login!");
+
+			username = customUser.getMember().getUserid();
+
+		} else { // 그냥 회원으로 로그인
+
+			username = principal.getName();
+		}
+
+		log.info("username............." + username);
+
+		model.addAttribute("memberInfo", service.findById(username));
+		model.addAttribute("requestList", service.findRequestFriends(username));
+		model.addAttribute("friendList", service.findFriends(username));
+		
+	}
+
+// -------------------------------------------------------------------------------------
 
 	@PostMapping("/quit")
 	public ResponseEntity<String> checkPwPOST(String userid) {

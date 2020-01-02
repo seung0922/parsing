@@ -12,15 +12,14 @@
 		
 		<!-- 메뉴명 & 설명 -->
 		<h4>정보수정</h4>
-		<p>정보</p>
+		<p>작성 후 수정 버튼을 눌러주세요.</p>
 
 		<!-- 본문 -->
 		<div>
 			<form class="form-horizontal" method="post" th:action="@{/mypage/myinfo}" id="f1">
 				<div class="form-group" id="divId">
-					<label for="inputId" class="col-lg-2 control-label">아이디</label>
 					<div class="col-lg-10">
-						<input type="text" name="userid" class="form-control form-control-user"
+						<input type="hidden" name="userid" class="form-control form-control-user"
 						id="userid" th:value="${memberInfo.userid}" readonly>
 					</div>
 				</div>
@@ -29,6 +28,7 @@
 					<div class="col-lg-10">
 						<input type="text" name="username" class="form-control form-control-user"
 						id="username" th:value="${memberInfo.username}">
+						<!-- <p style="color: red;" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p> -->
 					</div>
 				</div>
 				<div class="form-group" id="divEmail">
@@ -36,6 +36,7 @@
 					<div class="col-lg-10">
 						<input type="text" name="email" class="form-control form-control-user"
 						id="email" th:value="${memberInfo.email}">
+						<!-- <p style="color: red;" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p> -->
 					</div>
 				</div>
 				<div class="form-group" id="divPhoneNumber">
@@ -43,6 +44,7 @@
 					<div class="col-lg-10">
 						<input type="text" name="tel" class="form-control form-control-user"
 						id="tel" th:value="${memberInfo.tel}">
+						<!-- <p style="color: red;" th:if="${#fields.hasErrors('tel')}" th:errors="*{tel}"></p> -->
 					</div>
 				</div>
 				<div class="form-group">
@@ -50,6 +52,7 @@
 					<div class="col-lg-10">
 						<input type="text" name="mlang" class="form-control form-control-user"
 						id="mlang" th:value="${memberInfo.mlang}">
+						<!-- <p style="color: red;" th:if="${#fields.hasErrors('mlang')}" th:errors="*{mlang}"></p> -->
 					</div>
 				</div>
 				<div class="form-group">
