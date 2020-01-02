@@ -32,12 +32,12 @@
 
 	<!-- 친구 목록 -->
 	<select id="selectFriends" resultType="org.ezcode.demo.domain.FriendVO">
-		(select receiver
+		(select receiver, mateno
 		from tbl_friend
 		where sender = #{userid}
 		and friendcheck = 1)
 		union all
-		(select sender
+		(select sender, mateno
 		from tbl_friend
 		where receiver = #{userid}
 		and friendcheck = 1)
@@ -89,6 +89,13 @@
 	where userid = #{userid}
   </update>
 
+  <!-- 친구요청 수락 했을 때 -->
+  <update id="updateFriend">
+	update tbl_friend
+	set friendcheck = 1
+	where mateno = #{mateno}
+  </update>
+
   <delete id="deleteMember">
 	delete from tbl_member
 	where userid = #{userid}
@@ -97,6 +104,11 @@
   <delete id="deleteMemberAuth">
 	delete from tbl_member_auth
 	where userid = #{userid}
+  </delete>
+
+  <delete id="deleteFriend">
+	delete from tbl_friend
+	where mateno = #{mateno}
   </delete>
 
 </mapper>

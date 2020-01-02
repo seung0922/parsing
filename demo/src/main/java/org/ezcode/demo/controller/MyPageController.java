@@ -1,7 +1,9 @@
 package org.ezcode.demo.controller;
 
 import java.security.Principal;
+import java.util.List;
 
+import org.ezcode.demo.domain.FriendVO;
 import org.ezcode.demo.domain.MemberVO;
 import org.ezcode.demo.security.CustomOAuth2User;
 import org.ezcode.demo.service.MemberService;
@@ -104,6 +106,48 @@ public class MyPageController {
 		model.addAttribute("requestList", service.findRequestFriends(username));
 		model.addAttribute("friendList", service.findFriends(username));
 		
+	}
+
+	@PostMapping("/delmate")
+	public String delMatePOST(int mateno) {
+
+		log.info("" + mateno);
+
+		boolean result = service.deleteFriend(mateno);
+
+		log.info("" + result);
+
+		return "redirect:/mypage/mypartner";
+	}
+
+	@PostMapping("/updatemate")
+	public String updateMatePOST(int mateno) {
+
+		log.info("" + mateno);
+
+		boolean result = service.ModifyFriend(mateno);
+
+		log.info("" + result);
+
+		return "redirect:/mypage/mypartner";
+	}
+
+	@GetMapping("/pdetail")
+	public void partnerDetailGET(String userid, Model model) {
+
+		log.info("userid.........." + userid);
+
+		// userid 로 정보 가져옴
+		MemberVO mem = service.findById(userid);
+		log.info("" + mem);
+		model.addAttribute("detail", mem);
+
+		// userid 로 친구 목록 가져옴
+		List<FriendVO> fvo = service.findFriends(userid);
+		log.info("" + fvo);
+		model.addAttribute("flist", fvo);
+
+		log.info("partner detail....................");
 	}
 
 // -------------------------------------------------------------------------------------

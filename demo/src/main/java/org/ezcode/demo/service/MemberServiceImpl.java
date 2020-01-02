@@ -115,5 +115,22 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.selectRequestFriends(userid);
     }
 
+    @Override
+    public boolean deleteFriend(int mateno) {
+        
+        log.info("delete friend......................");
+        log.info("" + mateno);
+
+        return memberMapper.deleteFriend(mateno) == 1 ? true : false;
+    }
+
+    @Override
+    public boolean ModifyFriend(int mateno) {
+
+        log.info("modify friend......................");
+        log.info("" + mateno);
+
+        return memberMapper.updateFriend(mateno) == 1 ? true : false;
+    }
 
 }

@@ -27,4 +27,9 @@ public interface MemberService {
     public List<FriendVO> findFriends(String userid);
 
     public List<FriendVO> findRequestFriends(String userid);
+
+    public boolean deleteFriend(int mateno);
+
+    public boolean ModifyFriend(int mateno);
+
 }

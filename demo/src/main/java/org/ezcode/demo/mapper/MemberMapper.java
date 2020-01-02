@@ -33,4 +33,8 @@ public interface MemberMapper {
 
     public List<FriendVO> selectRequestFriends(String userid);
 
+    public int deleteFriend(int mateno);
+
+    public int updateFriend(int mateno);
+
 }
