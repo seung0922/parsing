@@ -14,6 +14,6 @@ public class FriendVO {
     private String sender;
     private String receiver;
     private Integer friendcheck;
-    private Date regdate;
+    private Date regDate;
     
 }

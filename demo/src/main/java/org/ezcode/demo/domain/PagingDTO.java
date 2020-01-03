@@ -49,7 +49,7 @@ public class PagingDTO {
     }
 
     public int getSkip(){
-        return (page-1)*amount;
+        return (page-1) * amount;
     }
 
     public String[] getCtarr() {

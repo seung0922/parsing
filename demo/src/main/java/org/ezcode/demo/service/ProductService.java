@@ -25,6 +25,9 @@ public interface ProductService {
     // 상품 상세
     public ProductVO findByPno(Integer pno);
 
+    // 상품 상세 (판매자 아이디로)
+    public List<ProductVO> findBySeller(String seller);
+
     //파일 삭제
     public int fileDelete(String uuid);
     

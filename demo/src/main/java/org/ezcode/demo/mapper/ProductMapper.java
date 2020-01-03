@@ -23,8 +23,11 @@ public interface ProductMapper {
     // 상품 목록
     public List<ProductVO> selectAll(PagingDTO dto);
 
-    // 상품 상세
+    // 상품 상세 (상품번호로)
     public ProductVO findByPno(Integer pno);
+
+    // 상품 상세목록 (판매자 아이디로)
+    public List<ProductVO> findBySeller(String seller);
 
     //파일 등록
     public int fileInsert(AttachDTO dto);
@@ -37,4 +40,5 @@ public interface ProductMapper {
 
     // 수정 - 파일 등록
     public int fileUpdate(AttachDTO dto);
+
 }

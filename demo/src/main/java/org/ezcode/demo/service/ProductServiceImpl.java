@@ -78,5 +78,10 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.getCount(dto);
     }
 
+    @Override
+    public List<ProductVO> findBySeller(String seller) {
+        return productMapper.findBySeller(seller);
+    }
+
  
 } 

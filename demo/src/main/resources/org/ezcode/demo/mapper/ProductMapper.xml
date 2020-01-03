@@ -178,6 +178,12 @@ values(#{uuid},last_insert_id(),#{fname},#{filetype},#{uploadpath},#{bno})
   order by pno desc
 </select>
 
+<select id="findBySeller" resultType="org.ezcode.demo.domain.ProductVO">
+  select *
+  from tbl_product
+  where seller = #{seller}
+</select>
+
 <update id="update">
   update 
   tbl_product 

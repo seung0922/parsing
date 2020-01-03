@@ -3,6 +3,13 @@
 
 <div class="container" th:replace="fragments/mypageLayout :: mypage-container">
 	<div class="mypage-content" layout:fragment="mypage-content">
+        <style>
+            .cell {display: table-cell; padding: 3px;}
+            #flist .col1 {width: 33.3%;}
+            #flist .col2 {width: 33.3%;}
+
+            .btn {font-size: 14px;}
+        </style>
 		<!-- css 링크 -->
 		<!-- <link rel="stylesheet" th:href="@{/css/css.css}"> -->
 
@@ -18,11 +25,73 @@
 
 		<!-- 본문 -->
         <div>
-            [[${detail}]]
 
-            <ul th:each="f : ${flist}">
-                <li th:text="${f.receiver}"></li>
-            </ul>
+            <div class="card mb-5">
+                <div class="card-header" style="font-size: 1.2em;">
+                    <span><b>[[${detail.userid}]]</b></span> <span  style="float: right;"><button class="btn btn-info">친구신청</button></span >
+                  </div>
+                <div class="row no-gutters">
+                  <div class="col-md-3">
+                    <img th:src="@{/images/user3.jpg}" alt="profile-image" style="width: 12rem;">
+                  </div>
+                  <div class="col-md-8">
+                    <div class="card-body">
+                      <h5 class="card-title">[[${detail.username}]]</h5>
+                      <p class="card-text"> 자기소개 입니다. </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+            <div class="row row-cols-1 row-cols-md-2">
+                <div class="col mb-4">
+                  <div class="card">
+                    <div class="card-header">
+                        친구 목록
+                    </div>
+                    <div id="table" class="card-body" style="display: table; width: 100%; text-align: center;">
+                
+                            <div class="row" style="display: table-row;">
+                                <span class="cell col1" style="border-bottom: 1px solid #DDD;"> <b>아이디</b></span>
+                                <span class="cell col2" style="border-bottom: 1px solid #DDD;"><b>친구정보</b></span>
+                            </div>
+            
+                            <div th:each="f : ${flist}" class="row" style="display: table-row;">
+                                <span class="cell col1"> [[${f.receiver}]] </span>
+                                <span class="cell col2"><button class="btn btn-link friendBtn">정보</button></span>
+    
+                                <input class="friendno" type="hidden" th:value="${f.mateno}">
+                                <input class="friendre" type="hidden" th:value="${f.receiver}">
+                            </div>
+            
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col mb-4">
+                    <div class="card">
+                      <div class="card-header">
+                          상품 목록
+                      </div>
+                      <div id="table" class="card-body" style="display: table; width: 100%; text-align: center;">
+                  
+                            <div class="row" style="display: table-row;">
+                                <span class="cell col1" style="border-bottom: 1px solid #DDD;"><b>상품</b></span>
+                                <span class="cell col2" style="border-bottom: 1px solid #DDD;"><b>설명</b></span>
+                            </div>
+            
+                            <div th:each="p : ${plist}" class="row" style="display: table-row;">
+                                <span class="cell col1">[[${p.pname}]]</span>
+                                <span class="cell col2">[[${p.summary}]]</span>
+    
+                            </div>
+              
+                      </div>
+                    </div>
+                  </div>
+              </div>
+
         </div>
         
 

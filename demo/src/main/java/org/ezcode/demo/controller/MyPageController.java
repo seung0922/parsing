@@ -7,6 +7,7 @@ import org.ezcode.demo.domain.FriendVO;
 import org.ezcode.demo.domain.MemberVO;
 import org.ezcode.demo.security.CustomOAuth2User;
 import org.ezcode.demo.service.MemberService;
+import org.ezcode.demo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,9 @@ public class MyPageController {
 
 	@Autowired
 	private MemberService service;
+
+	@Autowired
+	private ProductService productService;
 
 	@GetMapping("/mypage")
 	public void myPage() {
@@ -102,6 +106,8 @@ public class MyPageController {
 
 		log.info("username............." + username);
 
+		log.info("" + service.findRequestFriends(username));
+
 		model.addAttribute("memberInfo", service.findById(username));
 		model.addAttribute("requestList", service.findRequestFriends(username));
 		model.addAttribute("friendList", service.findFriends(username));
@@ -146,6 +152,9 @@ public class MyPageController {
 		List<FriendVO> fvo = service.findFriends(userid);
 		log.info("" + fvo);
 		model.addAttribute("flist", fvo);
+
+		// userid 로 판매글 목록 가져옴
+		model.addAttribute("plist", productService.findBySeller(userid));
 
 		log.info("partner detail....................");
 	}
