@@ -1,9 +1,6 @@
 package org.ezcode.demo.service;
 
-import java.util.List;
-
 import org.ezcode.demo.domain.AuthVO;
-import org.ezcode.demo.domain.FriendVO;
 import org.ezcode.demo.domain.MemberVO;
 import org.ezcode.demo.mapper.MemberMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,40 +94,6 @@ public class MemberServiceImpl implements MemberService {
         log.info("" + dm);
 
         return (dma + dm) == 2 ? true : false;
-    }
-
-    @Override
-    public List<FriendVO> findFriends(String userid) {
-
-        log.info("find friends..........................");
-
-        return memberMapper.selectFriends(userid);
-    }
-
-    @Override
-    public List<FriendVO> findRequestFriends(String userid) {
-
-        log.info("find request friends...........................");
-
-        return memberMapper.selectRequestFriends(userid);
-    }
-
-    @Override
-    public boolean deleteFriend(int mateno) {
-        
-        log.info("delete friend......................");
-        log.info("" + mateno);
-
-        return memberMapper.deleteFriend(mateno) == 1 ? true : false;
-    }
-
-    @Override
-    public boolean ModifyFriend(int mateno) {
-
-        log.info("modify friend......................");
-        log.info("" + mateno);
-
-        return memberMapper.updateFriend(mateno) == 1 ? true : false;
     }
 
 }

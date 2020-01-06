@@ -6,6 +6,7 @@ import java.util.List;
 import org.ezcode.demo.domain.FriendVO;
 import org.ezcode.demo.domain.MemberVO;
 import org.ezcode.demo.security.CustomOAuth2User;
+import org.ezcode.demo.service.FriendService;
 import org.ezcode.demo.service.MemberService;
 import org.ezcode.demo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -27,6 +29,9 @@ public class MyPageController {
 
 	@Autowired
 	private MemberService service;
+
+	@Autowired
+	private FriendService friendService;
 
 	@Autowired
 	private ProductService productService;
@@ -106,11 +111,11 @@ public class MyPageController {
 
 		log.info("username............." + username);
 
-		log.info("" + service.findRequestFriends(username));
+		log.info("" + friendService.findRequestFriends(username));
 
 		model.addAttribute("memberInfo", service.findById(username));
-		model.addAttribute("requestList", service.findRequestFriends(username));
-		model.addAttribute("friendList", service.findFriends(username));
+		model.addAttribute("requestList", friendService.findRequestFriends(username));
+		model.addAttribute("friendList", friendService.findFriends(username));
 		
 	}
 
@@ -119,7 +124,7 @@ public class MyPageController {
 
 		log.info("" + mateno);
 
-		boolean result = service.deleteFriend(mateno);
+		boolean result = friendService.deleteFriend(mateno);
 
 		log.info("" + result);
 
@@ -131,7 +136,7 @@ public class MyPageController {
 
 		log.info("" + mateno);
 
-		boolean result = service.ModifyFriend(mateno);
+		boolean result = friendService.ModifyFriend(mateno);
 
 		log.info("" + result);
 
@@ -139,7 +144,25 @@ public class MyPageController {
 	}
 
 	@GetMapping("/pdetail")
-	public void partnerDetailGET(String userid, Model model) {
+	public void partnerDetailGET(String userid, Principal principal, @AuthenticationPrincipal CustomOAuth2User customUser, Model model) {
+
+		// 소셜으로 로그인했는지, 그냥 회원으로 로그인했는지 구별해줘야 함
+		String myid = "";
+
+		if (customUser != null) { // 소셜 로그인
+
+			log.info("sns login!");
+
+			myid = customUser.getMember().getUserid();
+
+		} else { // 그냥 회원으로 로그인
+
+			myid = principal.getName();
+		}
+
+		log.info("my id.........." + myid);
+
+		model.addAttribute("myid", myid);
 
 		log.info("userid.........." + userid);
 
@@ -149,14 +172,24 @@ public class MyPageController {
 		model.addAttribute("detail", mem);
 
 		// userid 로 친구 목록 가져옴
-		List<FriendVO> fvo = service.findFriends(userid);
+		List<FriendVO> fvo = friendService.findFriends(userid);
 		log.info("" + fvo);
 		model.addAttribute("flist", fvo);
 
 		// userid 로 판매글 목록 가져옴
 		model.addAttribute("plist", productService.findBySeller(userid));
 
-		log.info("partner detail....................");
+		// 나랑 친구인지 아닌지?
+		model.addAttribute("fstate", friendService.checkFriend(myid, userid));
+	}
+
+	@PostMapping("/insertMate")
+	public String insertMate(String sender, String receiver) {
+
+		log.info("insert friend ...................");
+		log.info("" + friendService.makeFriend(sender, receiver));
+		
+		return "redirect:/mypage/pdetail?userid=" + receiver;
 	}
 
 // -------------------------------------------------------------------------------------

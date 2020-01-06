@@ -1,9 +1,6 @@
 package org.ezcode.demo.mapper;
 
-import java.util.List;
-
 import org.ezcode.demo.domain.AuthVO;
-import org.ezcode.demo.domain.FriendVO;
 import org.ezcode.demo.domain.MemberVO;
 
 /**
@@ -19,8 +16,6 @@ public interface MemberMapper {
 
     public MemberVO selectOneMemberById(String userid);
 
-    // public MemberVO selectOneMemberByIdAndPw(String userid, String userpw);
-
     public int updateMember(MemberVO vo);
 
     public int updatePw(MemberVO vo);
@@ -28,13 +23,5 @@ public interface MemberMapper {
     public int deleteMember(String userid);
 
     public int deleteMemberAuth(String userid);
-
-    public List<FriendVO> selectFriends(String userid);
-
-    public List<FriendVO> selectRequestFriends(String userid);
-
-    public int deleteFriend(int mateno);
-
-    public int updateFriend(int mateno);
 
 }

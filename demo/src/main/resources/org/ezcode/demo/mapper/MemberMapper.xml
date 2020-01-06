@@ -30,28 +30,6 @@
 		WHERE mem.userid = #{userid}
 	</select>
 
-	<!-- 친구 목록 -->
-	<select id="selectFriends" resultType="org.ezcode.demo.domain.FriendVO">
-		(select receiver, mateno
-		from tbl_friend
-		where sender = #{userid}
-		and friendcheck = 1)
-		union all
-		(select sender, mateno
-		from tbl_friend
-		where receiver = #{userid}
-		and friendcheck = 1)
-	</select>
-
-	<!-- 친구 요청 목록 -->
-	<select id="selectRequestFriends" resultType="org.ezcode.demo.domain.FriendVO">
-		select *
-		from tbl_friend
-		where (sender = #{userid}
-		or receiver = #{userid})
-		and friendcheck = 0
-	</select>
-
   <insert id="insertMember">
 	insert into 
 	tbl_member 
@@ -70,13 +48,6 @@
 	  where userid = #{userid}
   </select>
 
-  <!-- <select id="selectOneMemberByIdAndPw" resultType="org.ezcode.demo.domain.MemberVO">
-	select *
-	from tbl_member
-	where userid = #{userid}
-	and userpw = #{userpw}
-  </select> -->
-
   <update id="updateMember">
 	update tbl_member
 	set username = #{username}, email = #{email}, tel = #{tel}, mlang = #{mlang}
@@ -89,13 +60,6 @@
 	where userid = #{userid}
   </update>
 
-  <!-- 친구요청 수락 했을 때 -->
-  <update id="updateFriend">
-	update tbl_friend
-	set friendcheck = 1
-	where mateno = #{mateno}
-  </update>
-
   <delete id="deleteMember">
 	delete from tbl_member
 	where userid = #{userid}
@@ -104,11 +68,6 @@
   <delete id="deleteMemberAuth">
 	delete from tbl_member_auth
 	where userid = #{userid}
-  </delete>
-
-  <delete id="deleteFriend">
-	delete from tbl_friend
-	where mateno = #{mateno}
   </delete>
 
 </mapper>

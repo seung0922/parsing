@@ -1,8 +1,5 @@
 package org.ezcode.demo.service;
 
-import java.util.List;
-
-import org.ezcode.demo.domain.FriendVO;
 import org.ezcode.demo.domain.MemberVO;
 
 /**
@@ -23,13 +20,5 @@ public interface MemberService {
     public boolean ModifyPw(MemberVO vo);
 
     public boolean quitMember(String userid);
-
-    public List<FriendVO> findFriends(String userid);
-
-    public List<FriendVO> findRequestFriends(String userid);
-
-    public boolean deleteFriend(int mateno);
-
-    public boolean ModifyFriend(int mateno);
 
 }

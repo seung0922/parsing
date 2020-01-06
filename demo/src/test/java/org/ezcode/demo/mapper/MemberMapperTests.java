@@ -23,6 +23,9 @@ public class MemberMapperTests {
     private MemberMapper mapper;
 
     @Autowired
+    private FriendMapper friendMapper;
+
+    @Autowired
     private BCryptPasswordEncoder encoder;
 
     @Test
@@ -32,7 +35,7 @@ public class MemberMapperTests {
 
         List<FriendVO> voList = new ArrayList<>();
 
-        voList = mapper.selectFriends(userid);
+        // voList = friendMapper.selectRequestFriends(userid);
 
         voList.forEach(vo -> {
             log.info("" + vo);
