@@ -48,6 +48,17 @@
 	  where userid = #{userid}
   </select>
 
+  <select id="selectMemberListById" resultType="org.ezcode.demo.domain.MemberVO">
+	select *
+	from tbl_member
+	where userid like concat("%", #{userid}, "%")
+  </select>
+
+  <select id="selectAllMember" resultType="org.ezcode.demo.domain.MemberVO">
+	  select *
+	  from tbl_member
+  </select>
+
   <update id="updateMember">
 	update tbl_member
 	set username = #{username}, email = #{email}, tel = #{tel}, mlang = #{mlang}

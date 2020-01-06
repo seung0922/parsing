@@ -19,6 +19,6 @@ public interface FriendService {
 
     public boolean ModifyFriend(int mateno);
 
-    public int checkFriend(String userid, String fid);
+    public FriendVO checkFriend(String userid, String fid);
 
 }

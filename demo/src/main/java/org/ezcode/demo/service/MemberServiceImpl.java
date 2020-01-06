@@ -1,5 +1,7 @@
 package org.ezcode.demo.service;
 
+import java.util.List;
+
 import org.ezcode.demo.domain.AuthVO;
 import org.ezcode.demo.domain.MemberVO;
 import org.ezcode.demo.mapper.MemberMapper;
@@ -94,6 +96,18 @@ public class MemberServiceImpl implements MemberService {
         log.info("" + dm);
 
         return (dma + dm) == 2 ? true : false;
+    }
+
+    @Override
+    public List<MemberVO> findAllMember() {
+
+        return memberMapper.selectAllMember();
+    }
+
+    @Override
+    public List<MemberVO> findListById(String userid) {
+
+        return memberMapper.selectMemberListById(userid);
     }
 
 }

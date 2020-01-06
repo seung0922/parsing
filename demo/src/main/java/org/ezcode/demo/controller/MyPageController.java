@@ -11,12 +11,12 @@ import org.ezcode.demo.service.MemberService;
 import org.ezcode.demo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -119,6 +119,16 @@ public class MyPageController {
 		
 	}
 
+	@GetMapping("/findid")
+	public void mypartnerPOST(String userid, Model model) {
+
+		log.info(userid);
+
+		log.info("" + service.findListById(userid));
+
+		model.addAttribute("idList", service.findListById(userid));
+	}
+
 	@PostMapping("/delmate")
 	public String delMatePOST(int mateno) {
 
@@ -169,18 +179,23 @@ public class MyPageController {
 		// userid 로 정보 가져옴
 		MemberVO mem = service.findById(userid);
 		log.info("" + mem);
+
 		model.addAttribute("detail", mem);
 
 		// userid 로 친구 목록 가져옴
 		List<FriendVO> fvo = friendService.findFriends(userid);
 		log.info("" + fvo);
+
 		model.addAttribute("flist", fvo);
 
 		// userid 로 판매글 목록 가져옴
 		model.addAttribute("plist", productService.findBySeller(userid));
 
+		log.info("" + friendService.checkFriend(myid, userid));
+
 		// 나랑 친구인지 아닌지?
 		model.addAttribute("fstate", friendService.checkFriend(myid, userid));
+		
 	}
 
 	@PostMapping("/insertMate")

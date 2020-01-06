@@ -1,5 +1,7 @@
 package org.ezcode.demo.mapper;
 
+import java.util.List;
+
 import org.ezcode.demo.domain.AuthVO;
 import org.ezcode.demo.domain.MemberVO;
 
@@ -15,6 +17,10 @@ public interface MemberMapper {
     public MemberVO read(String userid);
 
     public MemberVO selectOneMemberById(String userid);
+
+    public List<MemberVO> selectMemberListById(String userid);
+
+    public List<MemberVO> selectAllMember();
 
     public int updateMember(MemberVO vo);
 

@@ -15,7 +15,6 @@
 		<!-- <link rel="stylesheet" th:href="@{/css/css.css}"> -->
 
 		<!-- Bootstrap -->
-        <!-- <link th:href="@{/resources/bootstrap/css/bootstrap.css}" rel="stylesheet" type="text/css"/> -->
         <link th:href="@{/resources/image/icon/HalfLife.ico}" rel="shortcuticon">
 		
         <!-- 메뉴명 & 설명 -->
@@ -24,15 +23,16 @@
             <!-- <p>내 친구 목록</p> -->
         </div>
 
-		<!-- 본문 -->
-        <div>
+		    <!-- 본문 -->
+        <div th:if="${detail} != null">
             <div class="card mb-5">
                 <div class="card-header" style="font-size: 1.2em;">
                     <span><b>[[${detail.userid}]]</b></span>
                     <span style="float: right;">
-                        <button th:if="${fstate} == 0 and ${detail.userid} != ${myid}" class="btn btn-info">친구신청</button>
-                        <button th:if="${fstate} == 1"class="btn btn-secondary" disable>친구요청중</button>
-                        <button th:if="${fstate} == 2"class="btn btn-danger delBtn">친구삭제</button>
+                        <button th:if="${fstate} == null and ${detail.userid} != ${myid}" class="btn btn-info">친구신청</button>
+                        <button th:if="${fstate} != null and ${fstate.friendcheck} == 0"class="btn btn-secondary" disable>친구요청중</button>
+                        <button th:if="${fstate} != null and ${fstate.friendcheck} == 1"class="btn btn-danger delBtn">친구삭제</button>
+                        <input th:if="${fstate} != null" class="friendno" type="hidden" th:value="${fstate.mateno}">
                     </span>
                   </div>
                 <div class="row no-gutters">
@@ -49,7 +49,7 @@
               </div>
 
             <div class="row row-cols-1 row-cols-md-2">
-                <div class="col mb-4">
+                <div th:if="${flist} != null" class="col mb-4">
                   <div class="card">
                     <div class="card-header">
                         친구 목록
@@ -72,7 +72,7 @@
                   </div>
                 </div>
                 
-                <div class="col mb-4">
+                <div th:if="${plist} != null" class="col mb-4">
                     <div class="card">
                       <div class="card-header">
                           상품 목록
@@ -112,6 +112,10 @@
         </form>
 
       </div>
+
+      <div th:if="${detail} == null">
+        <p>해당 사용자가 없습니다.</p>
+      </div>
         <!-- 본문끝 -->
 
 	<!-- script -->
@@ -126,7 +130,7 @@
 
         console.log("delete friend.................");
 
-        var mateno = $(this).parent().siblings("input[class=friendno]").val();
+        var mateno = $(this).siblings("input[class=friendno]").val();
         console.log(mateno);
 
         swal({

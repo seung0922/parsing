@@ -1,5 +1,7 @@
 package org.ezcode.demo.service;
 
+import java.util.List;
+
 import org.ezcode.demo.domain.MemberVO;
 
 /**
@@ -12,6 +14,10 @@ public interface MemberService {
     public MemberVO read(String userid);
 
     public MemberVO findById(String userid);
+
+    public List<MemberVO> findListById(String userid);
+
+    public List<MemberVO> findAllMember();
 
     public boolean checkByIdAndPw(String userid, String userpw);
 
