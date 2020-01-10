@@ -162,7 +162,7 @@ li {
 			<p id="flip" class="search-title">조건  &nbsp;<i class="fas fa-sort-down"></i></p>
               <div id="panel" class="search-condition">
 				<div class="search-content">
-					<div class="search-check langCon">
+					<div class="search-check langCon" style="margin-bottom: 24px;">
 					<p>언어</p>
 					<div class="custom-control custom-checkbox">
 					    <input type="checkbox" class="custom-control-input" id="JAVA" value="java" checked>
@@ -182,19 +182,20 @@ li {
 					<p>연동</p>
 					<ul>
 						<li>
-							<div class="custom-control custom-checkbox outerli">
+							<div class="custom-control custom-checkbox outerli" style="margin-bottom: 8px;">
 								<input type="checkbox" class="custom-control-input" id="Google" value="google" checked>
 								<label class="custom-control-label" for="Google">Google</label>
 							</div>
 						</li>
-						<li>
-							<div class="custom-control custom-checkbox outerli">
+						<th:block sec:authorize="isAuthenticated()">
+						<li th:if="${#strings.endsWith(#authentication.principal.member.userid, '_github')}">
+							<div class="custom-control custom-checkbox outerli" style="margin-bottom: 8px;">
 								<input type="checkbox" class="custom-control-input" id="GitHub" value="github">
 								<label class="custom-control-label" for="GitHub">GitHub</label>
 							</div>
-							<ul id="subUl">
+							<ul id="subUl" style="margin-left: 0px;">
 								<li>
-									<div class="custom-control custom-checkbox innerli">
+									<div class="custom-control custom-checkbox innerli" style="margin-bottom: 8px;">
 										<input type="checkbox" class="custom-control-input" id="myGitHub" value="myGithub">
 										<label class="custom-control-label" for="myGitHub">내 깃허브</label>
 									</div>
@@ -207,8 +208,8 @@ li {
 								</li>
 							</ul>
 						</li>
+						</th:block>
 					</ul>
-					
 					</div>
 
 					<div class="search-check commentCon">
@@ -217,10 +218,12 @@ li {
 						<input type="checkbox" class="custom-control-input" id="all" value="a" checked>
 						<label class="custom-control-label" for="all">All</label>
 					</div>
-					<div class="custom-control custom-checkbox">
+					<th:block sec:authorize="isAuthenticated()">
+					<div th:if="${#strings.endsWith(#authentication.principal.member.userid, '_github')}" class="custom-control custom-checkbox">
 						<input type="checkbox" class="custom-control-input" id="comm" value="c">
 						<label class="custom-control-label" for="comm">Only Comment</label>
 					</div>
+					</th:block>
 				</div>
 				</div>
               </div>
@@ -306,6 +309,10 @@ $linkCon.on('click', function() {
 		console.log($(this).val());
 
 		$innerLinkCon.prop('checked', false);
+
+		// All 체크 되게
+		$commentCon.prop('checked', false);
+		$commentCon.eq(0).prop('checked', true);
 	}
 
 	//클릭 이벤트 발생한 요소가 체크 상태인 경우

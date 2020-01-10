@@ -33,38 +33,43 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			<br>
 			<div class="linkCon">
 				<h6>사이트</h6>
-				<div class="github-group">
-					<div class="custom-control custom-checkbox">
-						<input type="checkbox" class="custom-control-input outer" id="github" value="github">
-						<label class="custom-control-label" for="github">GitHub</label>
-					</div>
-					<div class="custom-control custom-checkbox" style="margin-left: 10px;">
-						<input type="checkbox" class="custom-control-input innerGit" id="myGithub" value="myGithub">
-						<label class="custom-control-label" for="myGithub">내 깃허브</label>
-					</div>
-					<div class="custom-control custom-checkbox" style="margin-left: 10px;">
-						<input type="checkbox" class="custom-control-input innerGit" id="partnerGitHub" value="partnerGitHub">
-						<label class="custom-control-label" for="partnerGitHub">파트너 깃허브</label>
-					</div>
-				</div>
-
 				<div class="custom-control custom-checkbox">
 					<input type="checkbox" class="custom-control-input outer" id="google" value="google">
 					<label class="custom-control-label" for="google">Google</label>
 				</div>
+				<th:block sec:authorize="isAuthenticated()">
+				<div th:if="${#strings.endsWith(#authentication.principal.member.userid, '_github')}" class="github-group">
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input outer" id="github" value="github">
+						<label class="custom-control-label" for="github">GitHub</label>
+					</div>
+
+					<div class="custom-control custom-checkbox innerGit" style="margin-left: 10px;">
+						<input type="checkbox" class="custom-control-input" id="myGithub" value="myGithub">
+						<label class="custom-control-label" for="myGithub">내 깃허브</label>
+					</div>
+
+					<div class="custom-control custom-checkbox innerGit" style="margin-left: 10px;">
+						<input type="checkbox" class="custom-control-input" id="partnerGithub" value="partnerGithub">
+						<label class="custom-control-label" for="partnerGithub">파트너 깃허브</label>
+					</div>
+				</div>
+				</th:block>
 				
 			</div>
 			<br>
 			<div class="commentCon">
 				<h6>커멘트</h6>
 				<div class="custom-control custom-checkbox">
-					<input type="checkbox" class="custom-control-input" id="c">
-					<label class="custom-control-label" for="c">Only Comment</label>
-				</div>
-				<div class="custom-control custom-checkbox">
 					<input type="checkbox" class="custom-control-input" id="a">
 					<label class="custom-control-label" for="a">All</label>
 				</div>
+				<th:block sec:authorize="isAuthenticated()">
+				<div th:if="${#strings.endsWith(#authentication.principal.member.userid, '_github')}" class="custom-control custom-checkbox">
+					<input type="checkbox" class="custom-control-input" id="c">
+					<label class="custom-control-label" for="c">Only Comment</label>
+				</div>
+				</th:block>
 			</div>
 
 		</div>
@@ -159,7 +164,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
 			var $langCon = $('.langCon input[type="checkbox"]');
 			var $linkCon = $('.outer');
-			var $innerGitCon = $('.innerGit');
+			var $innerGitCon = $('.innerGit input');
 			var $commentCon = $('.commentCon input[type="checkbox"]');
 
 			// 체크박스 ---------------------------------------------------------------------
@@ -177,17 +182,21 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 					
 					console.log($(this).val());
 
+					$innerGitCon.prop('checked', false);
 					$innerGitCon.eq(0).prop('checked', true);
 
 				} else { // google 체크일 때 github 전체 다 체크해제 되게
 
+					$commentCon.prop("checked", false);
+					$commentCon.eq(0).prop("checked", true);
+					
 					console.log($(this).val());
-
 					$innerGitCon.prop('checked', false);
 				}
 
 				//클릭 이벤트 발생한 요소가 체크 상태인 경우
 				if ($(this).prop('checked')) {
+
 					//체크박스 그룹의 요소 전체를 체크 해제후 클릭한 요소 체크 상태지정
 					$linkCon.prop('checked', false);
 					$(this).prop('checked', true);
@@ -197,6 +206,12 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			});
 
 			$innerGitCon.on('click', function() {
+
+				$linkCon.eq(0).prop("checked", false);
+				$linkCon.eq(1).prop("checked", true);
+
+				console.log($(this).val())
+
 				//클릭 이벤트 발생한 요소가 체크 상태인 경우
 				if ($(this).prop('checked')) {
 					//체크박스 그룹의 요소 전체를 체크 해제후 클릭한 요소 체크 상태지정
@@ -279,7 +294,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 			var siteLink = $('#sf input[name=siteLink]').val();
 
 			linkConArr.each(function() {
-				
+
 				var item = $(this);
 				item.prop("checked", false);
 
