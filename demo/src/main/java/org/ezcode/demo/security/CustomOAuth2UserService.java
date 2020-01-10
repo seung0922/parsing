@@ -63,7 +63,7 @@ public class CustomOAuth2UserService implements OAuth2UserService {
 
         } else if(registrationId.equals("github")) {
 
-            snsId = ((Integer) attributesMap.get("id")).toString() + "_github";
+            snsId = (String) attributesMap.get("login") + "_github";
 
         }
 

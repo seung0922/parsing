@@ -16,7 +16,7 @@ import lombok.Data;
 public class MemberVO {
 
 	@NotNull
-	@Size(min = 5, max = 12, message = "5~12글자로 입력해주세요.")
+	@Size(min = 5, max = 20, message = "5~20글자로 입력해주세요.")
 	// @Pattern(regexp = "/^[A-Za-z0-9_\\-]{5,12}$/", message = "영문과 숫자, _ ,  - 만 입력해주세요.")
 	private String userid;
 	

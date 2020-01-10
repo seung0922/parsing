@@ -72,7 +72,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 		var header = $("meta[name='_csrf_header']").attr("content");
 
 		// 영문 대소문자, 숫자, _ , - 만 사용 가능한 정규식
-		var userIdCheck = RegExp(/^[A-Za-z0-9_\-]{5,12}$/);
+		var userIdCheck = RegExp(/^[A-Za-z0-9_\-]{5,20}$/);
 
 		$("#idChck").on("click", function(e) {
 

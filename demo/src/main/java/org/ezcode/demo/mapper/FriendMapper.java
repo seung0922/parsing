@@ -21,4 +21,5 @@ public interface FriendMapper {
 
     public FriendVO checkFriend(String userid, String fid);
 
+    public List<String> selectGithubFriends(String userid);
 }

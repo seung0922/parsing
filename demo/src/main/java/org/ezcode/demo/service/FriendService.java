@@ -15,6 +15,8 @@ public interface FriendService {
 
     public List<FriendVO> findRequestFriends(String userid);
 
+    public List<String> findGithubFriends(String userid);
+
     public boolean deleteFriend(int mateno);
 
     public boolean ModifyFriend(int mateno);

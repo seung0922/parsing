@@ -65,4 +65,10 @@ public class FriendServiceImpl implements FriendService {
         return friendMapper.insertFriend(sender, receiver) == 1 ? true : false;
     }
 
+    @Override
+    public List<String> findGithubFriends(String userid) {
+
+        return friendMapper.selectGithubFriends(userid);
+    }
+
 }

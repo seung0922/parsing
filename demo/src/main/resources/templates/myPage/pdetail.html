@@ -30,8 +30,8 @@
                     <span><b>[[${detail.userid}]]</b></span>
                     <span style="float: right;">
                         <button th:if="${fstate} == null and ${detail.userid} != ${myid}" class="btn btn-info">친구신청</button>
-                        <button th:if="${fstate} != null and ${fstate.friendcheck} == 0"class="btn btn-secondary" disable>친구요청중</button>
-                        <button th:if="${fstate} != null and ${fstate.friendcheck} == 1"class="btn btn-danger delBtn">친구삭제</button>
+                        <button th:if="${fstate} != null and ${fstate.friendcheck} == 0" class="btn btn-secondary" disable>친구요청중</button>
+                        <button th:if="${fstate} != null and ${fstate.friendcheck} == 1" class="btn btn-danger delBtn">친구삭제</button>
                         <input th:if="${fstate} != null" class="friendno" type="hidden" th:value="${fstate.mateno}">
                     </span>
                   </div>

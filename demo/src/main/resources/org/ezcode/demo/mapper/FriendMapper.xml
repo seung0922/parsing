@@ -46,6 +46,22 @@
 		and friendcheck = 0
 	</select>
 
+	<!-- github 로그인한 친구 찾기 -->
+	<select id="selectGithubFriends" resultType="String">
+		select receiver
+		from (
+		(select receiver, mateno
+		from tbl_friend
+		where sender = #{userid}
+		and friendcheck = 1)
+		union all
+		(select sender, mateno
+		from tbl_friend
+		where receiver = #{userid}
+		and friendcheck = 1) ) as t
+		where receiver like '%_github'
+	</select>
+
   <!-- 친구요청 수락 했을 때 -->
   <update id="updateFriend">
 	update tbl_friend

@@ -51,6 +51,7 @@
         and comment = 1
     </if>
     and siteLink = #{siteLink}
+    <!-- and path like concat("%", #{path}, "%") -->
     limit #{skip}, #{amount}
 </select>
 

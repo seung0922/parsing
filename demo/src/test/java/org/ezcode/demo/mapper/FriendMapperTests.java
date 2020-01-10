@@ -1,5 +1,9 @@
 package org.ezcode.demo.mapper;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.ezcode.demo.domain.ParseVO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,4 +33,21 @@ public class FriendMapperTests {
 
         log.info("" + mapper.checkFriend("789789", "123123"));
     }
+
+    @Test
+    public void gitFriendTest() {
+
+        List<ParseVO> result = new ArrayList<ParseVO>();
+
+        List<String> gitFriendList = mapper.selectGithubFriends("aaa123");
+        List<String> gitFriendList2 = mapper.selectGithubFriends("aaa123");
+
+        log.info("" + gitFriendList);
+        log.info("" + gitFriendList2);
+
+        gitFriendList.addAll(gitFriendList2);
+
+        log.info("" + gitFriendList);
+    }
+
 }

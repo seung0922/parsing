@@ -115,14 +115,23 @@ header a {
 	padding: 0px;
 }
 
+li {
+	list-style: none;
+	/* display: inline-block; */
+}
+
+.linkCon ul {
+	padding-inline-start: 0px;
+}
+
+#subUl {
+	padding-inline-start: 40px;
+}
+
 </style>
-
-
-
 
     <div class=" ">
       <div class="site-blocks-cover overlay overlay-2 wrapper"  data-aos="fade" id="home-section">
-
 
         <div class="container">
           <div class="row align-items-center justify-content-center">
@@ -148,10 +157,10 @@ header a {
 			  <input type="hidden" name="siteLink">
 			  <input type="hidden" name="comment">
 			</form>
-              
+
 			<!-- 조건 -->
-			<p class="search-title">조건  &nbsp;<i class="fas fa-sort-down"></i></p>
-              <div class="search-condition">
+			<p id="flip" class="search-title">조건  &nbsp;<i class="fas fa-sort-down"></i></p>
+              <div id="panel" class="search-condition">
 				<div class="search-content">
 					<div class="search-check langCon">
 					<p>언어</p>
@@ -171,35 +180,54 @@ header a {
 
 					<div class="search-check linkCon">
 					<p>연동</p>
-					<div class="custom-control custom-checkbox">
-					    <input type="checkbox" class="custom-control-input" id="GitHub" value="github" checked>
-					    <label class="custom-control-label" for="GitHub">GitHub</label>
-					</div>
-					<div class="custom-control custom-checkbox">
-					    <input type="checkbox" class="custom-control-input" id="Google" value="google">
-					    <label class="custom-control-label" for="Google">Google</label>
-					</div>
+					<ul>
+						<li>
+							<div class="custom-control custom-checkbox outerli">
+								<input type="checkbox" class="custom-control-input" id="Google" value="google" checked>
+								<label class="custom-control-label" for="Google">Google</label>
+							</div>
+						</li>
+						<li>
+							<div class="custom-control custom-checkbox outerli">
+								<input type="checkbox" class="custom-control-input" id="GitHub" value="github">
+								<label class="custom-control-label" for="GitHub">GitHub</label>
+							</div>
+							<ul id="subUl">
+								<li>
+									<div class="custom-control custom-checkbox innerli">
+										<input type="checkbox" class="custom-control-input" id="myGitHub" value="myGithub">
+										<label class="custom-control-label" for="myGitHub">내 깃허브</label>
+									</div>
+								</li>
+								<li>
+									<div class="custom-control custom-checkbox innerli">
+										<input type="checkbox" class="custom-control-input" id="partnerGitHub" value="partnerGithub">
+										<label class="custom-control-label" for="partnerGitHub">파트너 깃허브</label>
+									</div>
+								</li>
+							</ul>
+						</li>
+					</ul>
+					
 					</div>
 
 					<div class="search-check commentCon">
 					<p>커멘트</p>
 					<div class="custom-control custom-checkbox">
-						<input type="checkbox" class="custom-control-input" id="comm" value="c" checked>
-						<label class="custom-control-label" for="comm">Only Comment</label>
-					</div>
-					<div class="custom-control custom-checkbox">
-						<input type="checkbox" class="custom-control-input" id="all" value="a">
+						<input type="checkbox" class="custom-control-input" id="all" value="a" checked>
 						<label class="custom-control-label" for="all">All</label>
 					</div>
+					<div class="custom-control custom-checkbox">
+						<input type="checkbox" class="custom-control-input" id="comm" value="c">
+						<label class="custom-control-label" for="comm">Only Comment</label>
 					</div>
 				</div>
+				</div>
               </div>
-
 			</div>
 			
           </div>
         </div>
-
 
       </div>
 
@@ -211,20 +239,12 @@ header a {
 	
 <script type="text/javascript">
 
-// 검색 조건 클릭 시 조건 창 보이기
-
-$('.search-title').on('click', function() {
-	var $searchCondition = $('.search-condition');
-	
-	if($searchCondition.css("display") === "none") {
-		$searchCondition.css('display', 'block');
-	}
-	else if($searchCondition.css("display") == "block") {
-		$searchCondition.css('display', 'none');
-	}
-});
-
 $(document).ready(function() {
+	
+	// 검색 조건 클릭 시 조건 창 보이기
+	$("#flip").click(function () {
+		$("#panel").slideToggle("slow");
+	});
 
 	$('.js-sticky-header').removeClass('sticky-custom');
 	$('.js-sticky-header').removeClass('shrink');
@@ -260,7 +280,8 @@ $(window).scroll(function() {
 <script>
 
 var $langCon = $('.langCon input[type="checkbox"]');
-var $linkCon = $('.linkCon input[type="checkbox"]');
+var $linkCon = $('.linkCon .outerli input[type="checkbox"]');
+var $innerLinkCon = $('.innerli input[type="checkbox"]');
 var $commentCon = $('.commentCon input[type="checkbox"]');
 
 // 체크박스 ---------------------------------------------------------------------
@@ -273,14 +294,46 @@ $langCon.on('click', function() {
 
 $linkCon.on('click', function() {
 
+	// github 체크일 때 myGithub 체크 되게
+	if($(this).val() === 'github') {
+		
+		console.log($(this).val());
+
+		$innerLinkCon.eq(0).prop('checked', true);
+
+	} else { // google 체크일 때 github 전체 다 체크해제 되게
+
+		console.log($(this).val());
+
+		$innerLinkCon.prop('checked', false);
+	}
+
 	//클릭 이벤트 발생한 요소가 체크 상태인 경우
 	if ($(this).prop('checked')) {
 		//체크박스 그룹의 요소 전체를 체크 해제후 클릭한 요소 체크 상태지정
 		$linkCon.prop('checked', false);
 		$(this).prop('checked', true);
+
 	} else {
 		$(this).prop('checked', true);
 	}
+
+});
+
+$innerLinkCon.on('click', function() {
+
+	$linkCon.prop('checked', false);
+	$linkCon.eq(1).prop('checked', true);
+
+	//클릭 이벤트 발생한 요소가 체크 상태인 경우
+	if ($(this).prop('checked')) {
+		//체크박스 그룹의 요소 전체를 체크 해제후 클릭한 요소 체크 상태지정
+		$innerLinkCon.prop('checked', false);
+		$(this).prop('checked', true);
+	} else {
+		$(this).prop('checked', true);
+	}
+
 });
 
 //라디오 요소처럼 동작시킬 체크박스 그룹 셀렉터
@@ -319,10 +372,13 @@ $('#searchBtn').on('click', function() {
 	});
 
 	// 연동 조건
-	$('.linkCon input[type=checkbox]:checked').each(function() {
-			
-		$("input[name=siteLink]").val($(this).val());
+	$('.linkCon input[type=checkbox]:checked').filter(function() {
 		
+		return this.value != 'github';
+
+	}).each(function() {
+
+		$("input[name=siteLink]").val($(this).val());
 	});
 
 	// 커멘트 조건

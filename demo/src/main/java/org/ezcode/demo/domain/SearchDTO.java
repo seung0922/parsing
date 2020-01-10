@@ -16,6 +16,7 @@ public class SearchDTO {
 	private String lang;
     private String siteLink;
 	private String comment;
+	private String path;
 
 	public SearchDTO(int page, int amount){
         this.page = page;

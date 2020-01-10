@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -15,18 +16,20 @@ import java.util.stream.Stream;
 import org.ezcode.demo.domain.PageMaker;
 import org.ezcode.demo.domain.ParseVO;
 import org.ezcode.demo.domain.SearchDTO;
+import org.ezcode.demo.security.CustomOAuth2User;
+import org.ezcode.demo.service.FriendService;
 import org.ezcode.demo.service.ParseService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
@@ -34,8 +37,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SearchController {
 
-	@Setter(onMethod_ = @Autowired)
+	@Autowired
 	private ParseService parseService;
+
+	@Autowired
+	private FriendService friendService;
 
 	private List<ParseVO> result = new ArrayList<ParseVO>();
 
@@ -52,15 +58,13 @@ public class SearchController {
 	}
 
 	@GetMapping("/list")
-	public void searchList(@ModelAttribute("dto") SearchDTO dto, Model model) {
-		
+	public void searchList(@ModelAttribute("dto") SearchDTO dto, Model model
+		, Principal principal, @AuthenticationPrincipal CustomOAuth2User customUser) {
+
 		String[] keywordArr = dto.getKeywords();
 		
 		// 1. 키워드 없을 때
 		if(dto.getKeyword().equals("")) {
-
-			// model.addAttribute("count", 0);
-			// model.addAttribute("list", new ParseVO());
 
 			List<ParseVO> nullList = new ArrayList<>();
 
@@ -89,16 +93,72 @@ public class SearchController {
 
 					log.info("널임");
 
-					// 2-1. 검색 사이트 github일 때
-					if(dto.getSiteLink().equals("github")) {
+					log.info("" + dto);
 
-						// 1파일 저장된 경로에서 해당키워드로 파싱한 다음 DB에 저장시킴
-						String saveDir = "C:\\ezcode";
-						log.info("keyword..........................." + k);
+					// 2-1. 검색 사이트 github일 때
+					if(dto.getSiteLink().equals("myGithub") || dto.getSiteLink().equals("partnerGithub")) {
+
+						log.info("if문........................");
+
+						// 깃허브 로그인 시 아이디 저장 ( 내 깃허브 연동 위해서 )
+						String githubId = (String) customUser.getAttributes().get("login");
+
+						log.info("깃아이디............" + githubId);
+
+						// 내 깃허브일 때
+						if(dto.getSiteLink().equals("myGithub")) {
+
+							// 파일 저장된 경로에서 해당키워드로 파싱한 다음 DB에 저장시킴
+							log.info("keyword..........................." + k);
+
+							// 저장 경로 변수
+							String saveDir = "C:\\ezcode\\" + githubId;
+							log.info("저장경로.........................." + saveDir);
+							
+							dto.setPath(githubId);
+
+							log.info("dto path set......." + dto);
+
+							dto.setSiteLink("github");
+
+							log.info("" + dto);
+		
+							result = playParsing(saveDir, k, dto.getComment(), dto.getLangs());
+
+						// 친구 깃허브일 때
+						} else if(dto.getSiteLink().equals("partnerGithub")) {
+
+							log.info("partner github.....");
+
+							List<String> gitFriendList = friendService.findGithubFriends(githubId + "_github");
+
+							log.info("깃허브 친구 목록......." + gitFriendList);
+
+							gitFriendList.forEach(f -> {
+
+								f = f.substring(0, f.lastIndexOf("_"));
+
+								log.info("friend id..........." + f);
+
+								String saveDir = "C:\\ezcode\\" + f;
+
+								log.info("저장경로.........................." + saveDir);
+								
+								dto.setPath(f);
+
+								log.info("dto path set......." + dto);
+
+								dto.setSiteLink("github");
 	
-						result = playParsing(saveDir, k, dto.getComment(), dto.getLangs());
+								log.info("" + dto);
+
+								result.addAll(playParsing(saveDir, k, dto.getComment(), dto.getLangs()));
+							});
+
+						} // partner github 끝
 						
 					} else { // 2-2. 검색사이트 google일 때
+
 						result = ( crawling(dto.getKeyword(), dto.getLang()) );
 					}
 
