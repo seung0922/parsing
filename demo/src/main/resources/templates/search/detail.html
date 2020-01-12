@@ -20,19 +20,18 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
          	<div class="code-info">
 				<a id="fname" href="#" th:text="${result.fname}"></a>
 				<span> | <small th:text="${result.lang}"></small></span>
-				<span th:if="${param.siteLink.toString().equals('github')}" >  |  <i class="fab fa-github"></i> <small>[[${param.siteLink}]]</small>
+				<span th:if="${param.siteLink.toString().contains('Github')}" >  |  <i class="fab fa-github"></i> <small>github</small>
 				</span>
 				<span th:if="${param.siteLink.toString().equals('google')}" >  |  <i class="fab fa-google"></i> <small>[[${param.siteLink}]]</small>
 				</span>
 				<span> | <small id="lineCnt"></small></span>
 				<span> |
 					<small>
-						<a th:if="${param.siteLink.toString().equals('github')}" id="pathLink" th:href="${param.siteLink}" target="_blank"></a>
+						<a th:if="${param.siteLink.toString().contains('Github')}" id="pathLink" th:href="${param.siteLink}" target="_blank"></a>
 						<a th:if="${param.siteLink.toString().equals('google')}" id="pathLink" th:href="${result.path}" th:text="${result.path}" target="_blank"></a>
 					</small>
 				</span>
 				<input id="hpath" type="hidden" th:value=${result.path}>
-
 				<div class="sdetail-btns">
 					<button class="btn btn-sm btn-primary btn-outline-primary tbtn">
 					<!-- 비어있는 별-->
@@ -142,7 +141,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 				// 해당 코드 주소 가기
 				var $pathLink = $('#pathLink');
 
-				if($pathLink.attr("href") === "github") {
+				if($pathLink.attr("href") === "myGithub" || $pathLink.attr("href") === "partnerGithub") {
 					var fname = $('#fname').text();
 					var str = $('#hpath').val();
 

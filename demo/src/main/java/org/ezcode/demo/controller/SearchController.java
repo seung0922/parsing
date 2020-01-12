@@ -88,25 +88,35 @@ public class SearchController {
 				// 파싱한 결과 저장하는 리스트
 				result = new ArrayList<ParseVO>();
 
-				// 키워드 하나 지정한 걸로 검색했는데 null 뜨면
-				if (parseService.find(dto).isEmpty()) {
+				String curSiteLink = dto.getSiteLink();
 
-					log.info("널임");
+				log.info("입력받은 사이트 링크....." + curSiteLink);
 
-					log.info("" + dto);
+				String githubId = "";
 
-					// 2-1. 검색 사이트 github일 때
-					if(dto.getSiteLink().equals("myGithub") || dto.getSiteLink().equals("partnerGithub")) {
+				List<String> gitFriendList = new ArrayList<>();
 
-						log.info("if문........................");
+				// 2-1. 검색사이트 github일때
+				if(curSiteLink.contains("Github")) {
 
-						// 깃허브 로그인 시 아이디 저장 ( 내 깃허브 연동 위해서 )
-						String githubId = (String) customUser.getAttributes().get("login");
+					githubId = (String) customUser.getAttributes().get("login");
 
-						log.info("깃아이디............" + githubId);
+					if(dto.getSiteLink().equals("myGithub")) {
+						
+						dto.setSiteLink("github");
+						dto.setPath(githubId);
 
-						// 내 깃허브일 때
-						if(dto.getSiteLink().equals("myGithub")) {
+						// 키워드 하나 지정한 걸로 검색했는데 null 뜨면
+						if (parseService.find(dto).isEmpty()) {
+
+							log.info("널임");
+							log.info("" + dto);
+
+							log.info("원래 사이트 링크...." + curSiteLink);
+
+							dto.setSiteLink(curSiteLink);
+
+							log.info("원래대로 다시 돌린 사이트 링크...." + dto.getSiteLink());
 
 							// 파일 저장된 경로에서 해당키워드로 파싱한 다음 DB에 저장시킴
 							log.info("keyword..........................." + k);
@@ -124,27 +134,41 @@ public class SearchController {
 							log.info("" + dto);
 		
 							result = playParsing(saveDir, k, dto.getComment(), dto.getLangs());
+						}
 
-						// 친구 깃허브일 때
-						} else if(dto.getSiteLink().equals("partnerGithub")) {
+					} else if(dto.getSiteLink().equals("partnerGithub")) {
 
-							log.info("partner github.....");
+						gitFriendList = friendService.findGithubFriends(githubId + "_github");
+						
+						log.info("깃허브 친구 목록......." + gitFriendList);
 
-							List<String> gitFriendList = friendService.findGithubFriends(githubId + "_github");
+						dto.setSiteLink("github");
 
-							log.info("깃허브 친구 목록......." + gitFriendList);
+						gitFriendList.forEach(friend -> {
 
-							gitFriendList.forEach(f -> {
+							friend = friend.substring(0, friend.lastIndexOf("_"));
 
-								f = f.substring(0, f.lastIndexOf("_"));
+							dto.setPath(friend);
 
-								log.info("friend id..........." + f);
+							// 키워드 하나 지정한 걸로 검색했는데 null 뜨면
+							if (parseService.find(dto).isEmpty()) {
 
-								String saveDir = "C:\\ezcode\\" + f;
+								log.info("널임");
+								log.info("" + dto);
+
+								log.info("원래 사이트 링크...." + curSiteLink);
+
+								dto.setSiteLink(curSiteLink);
+
+								log.info("원래대로 다시 돌린 사이트 링크...." + dto.getSiteLink());
+
+								log.info("friend id..........." + friend);
+
+								String saveDir = "C:\\ezcode\\" + friend;
 
 								log.info("저장경로.........................." + saveDir);
 								
-								dto.setPath(f);
+								dto.setPath(friend);
 
 								log.info("dto path set......." + dto);
 
@@ -153,25 +177,25 @@ public class SearchController {
 								log.info("" + dto);
 
 								result.addAll(playParsing(saveDir, k, dto.getComment(), dto.getLangs()));
-							});
-
-						} // partner github 끝
-						
-					} else { // 2-2. 검색사이트 google일 때
-
-						result = ( crawling(dto.getKeyword(), dto.getLang()) );
+							}
+						});
 					}
 
-					log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-					log.info("" + result);
-					log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+				} else if(dto.getSiteLink().equals("google")) { // 2-2. 검색사이트 google일 때
 
-					result.forEach(r -> {
-						log.info("" + r);
-						parseService.insertCode(r);
-					});
+					if (parseService.find(dto).isEmpty()) {
+						result = ( crawling(dto.getKeyword(), dto.getLang()) );
+					}
+				}
 
-				} 
+				log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+				log.info("" + result);
+				log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+
+				result.forEach(r -> {
+					log.info("" + r);
+					parseService.insertCode(r);
+				});
 
 			});
 

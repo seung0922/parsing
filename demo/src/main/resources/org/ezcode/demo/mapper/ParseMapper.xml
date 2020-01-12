@@ -75,6 +75,7 @@
         and comment = 1
     </if>
     and siteLink = #{siteLink}
+    and path like concat("%", #{path}, "%")
 </select>
 
 <insert id="insertCode">
